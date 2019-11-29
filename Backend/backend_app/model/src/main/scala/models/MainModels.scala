@@ -6,4 +6,4 @@ import io.circe.generic.JsonCodec
 case class ResponseTrue(result: Boolean = true)
 
 @JsonCodec
-case class ResponseToken(result: Boolean = true, token: String)
+case class ResponseFalse(result: Boolean = false, errors: List[String])

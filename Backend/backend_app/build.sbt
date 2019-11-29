@@ -41,7 +41,7 @@ lazy val controller =
     .dependsOn(model)
     .settings(scalaSettings: _*)
     .settings(
-      libraryDependencies ++= slickDeps ++ circeDeps
+      libraryDependencies ++= slickDeps ++ circeDeps ++ appDeps
     )
 
 lazy val view =

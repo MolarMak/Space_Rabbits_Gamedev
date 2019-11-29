@@ -1,7 +1,7 @@
 package view
 
 import akka.http.scaladsl.server.{Directives, Route}
-import apiVersions.QuizApiV1
+import apiVersions.v1.QuizApiV1
 
 class QuizConfig extends Directives {
 
@@ -11,7 +11,7 @@ class QuizConfig extends Directives {
     }
 
   def routes: Route = {
-    val quizApiList = List(new QuizApiV1())
+    val quizApiList : List[QuizApiTrait] = List(new QuizApiV1())
 
     val routeList = quizApiList.map(quizRoutes).reduce(_ ~ _)
 
