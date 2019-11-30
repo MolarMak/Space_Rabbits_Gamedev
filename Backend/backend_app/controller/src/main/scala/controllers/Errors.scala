@@ -26,4 +26,12 @@ class Errors(private val language: String) {
     case _ => "Registration error"
   }
 
+  def ERROR_TOKEN_NOT_VALID: String = language match {
+    case _ => "Token not valid"
+  }
+
+  def ERROR_WHEN_LOGOUT: String = language match  {
+    case _ => "Error when logout"
+  }
+
 }

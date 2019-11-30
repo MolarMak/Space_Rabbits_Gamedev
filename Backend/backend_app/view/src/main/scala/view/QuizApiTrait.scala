@@ -8,4 +8,6 @@ trait QuizApiTrait {
 
   def register: Route
 
+  def logout: Route
+
 }

@@ -12,11 +12,13 @@ import scala.util.Success
 trait AuthControllerTrait {
   def loginController(loginRequest: LoginRequest) : Route
   def registerController(registerRequest: RegisterRequest) : Route
+  def logoutController(token: String) : Route
 }
 
 trait AuthViewTrait extends ViewTrait {
   def onLogin(token: String) : Route
   def onRegister(token: String) : Route
+  def onLogout : Route
 }
 
 class AuthController(private val db: Database, private val view: AuthViewTrait) extends Directives with AuthControllerTrait {
@@ -75,6 +77,19 @@ class AuthController(private val db: Database, private val view: AuthViewTrait) 
   /** Register END **/
 
 
+  /** Logout START **/
+  override def logoutController(token: String): Route = {
+    val newToken = generateToken()
+    val logoutFuture = userRepository.logoutByToken(token, newToken)
+    onComplete(logoutFuture) {
+      case Success(1) => view.onLogout
+      case Success(0) => view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
+      case _ => view.onError(List(errors.ERROR_WHEN_LOGOUT))
+    }
+  }
+  /** Logout END **/
+
+
   /** Validation START **/
   private def nameRule(name: String) = name.length > 2 && name.length < 30
   private def passwordRule(password: String) = password.length >= 8
@@ -94,5 +109,4 @@ class AuthController(private val db: Database, private val view: AuthViewTrait) 
     ))
   }
   /** Validation END **/
-
 }

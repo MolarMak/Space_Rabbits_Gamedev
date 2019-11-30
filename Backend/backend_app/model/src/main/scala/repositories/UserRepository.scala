@@ -26,4 +26,12 @@ class UserRepository(val db: Database)(implicit ec: ExecutionContext) extends Ba
         .exists
         .result
     )
+
+  def logoutByToken(oldToken: String, newToken: String): Future[Int] =
+    db.run(
+      UserTable.table
+        .filter(_.token === oldToken)
+        .map(_.token)
+        .update(newToken)
+    )
 }

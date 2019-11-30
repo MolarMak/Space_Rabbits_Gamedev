@@ -1,12 +1,13 @@
 package apiVersions.v1
 
+import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.{Directives, Route}
 import controllers.{AuthController, AuthControllerTrait, AuthViewTrait}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.syntax._
-import models.{LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, ResponseFalse}
-import view.log
+import models._
 import slick.jdbc.PostgresProfile.backend.Database
+import view.log
 
 class AuthView(private val db: Database) extends Directives with FailFastCirceSupport with AuthViewTrait {
 
@@ -32,12 +33,28 @@ class AuthView(private val db: Database) extends Directives with FailFastCirceSu
       }
     }
 
+  def logout: Route =
+    path("api" / apiVersion / "logout") {
+      parameter('token.as[String]) { token =>
+        log("logout", s"input: $token")
+        controller.logoutController(token)
+      }
+    }
+
   override def onLogin(token: String): Route = {
     complete(LoginResponse(result = true, token).asJson)
   }
 
   override def onRegister(token: String): Route = {
     complete(RegisterResponse(result = true, token).asJson)
+  }
+
+  override def onLogout: Route = {
+    complete(ResponseTrue().asJson)
+  }
+
+  override def onAuthError(errors: List[String]): Route = {
+    complete((Unauthorized, ResponseFalse(result = false, errors)))
   }
 
   override def onError(errors: List[String]): Route = {

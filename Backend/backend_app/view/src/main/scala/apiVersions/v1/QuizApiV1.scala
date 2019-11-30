@@ -13,4 +13,6 @@ class QuizApiV1(private val db: Database) extends QuizApiTrait {
 
   def register: Route = authView.register
 
+  def logout: Route = authView.logout
+
 }

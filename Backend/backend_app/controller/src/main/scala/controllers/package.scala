@@ -6,6 +6,7 @@ package object controllers {
 
   trait ViewTrait {
     def onError(errors: List[String]) : Route
+    def onAuthError(errors: List[String]) : Route
   }
 
   trait DomainValidation {
