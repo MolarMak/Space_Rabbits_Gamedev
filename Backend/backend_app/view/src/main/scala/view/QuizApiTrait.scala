@@ -6,4 +6,6 @@ trait QuizApiTrait {
 
   def login: Route
 
+  def register: Route
+
 }

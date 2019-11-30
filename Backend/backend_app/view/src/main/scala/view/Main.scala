@@ -17,7 +17,7 @@ object Main {
     implicit val materialise: ActorMaterializer = ActorMaterializer()
     val http: HttpExt = Http()
 
-    val quizApi = new QuizConfig()
+    val quizApi = new QuizConfig(db)
 
     val bindingFuture = http.bindAndHandle(quizApi.routes, "0.0.0.0", 8080)
 
