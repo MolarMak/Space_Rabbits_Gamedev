@@ -9,7 +9,7 @@ import slick.jdbc.PostgresProfile.backend.Database
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Success
 
-trait AuthControllerTrait extends ControllerTrait {
+trait AuthControllerTrait {
   def loginController(loginRequest: LoginRequest) : Route
   def registerController(registerRequest: RegisterRequest) : Route
 }
@@ -71,10 +71,6 @@ class AuthController(private val db: Database, private val view: AuthViewTrait) 
       case Success(1) => view.onRegister(token)
       case _ => view.onError(List(errors.ERROR_REGISTRATION))
     }
-  }
-
-  override def onError(errors: List[String]): Unit = {
-    view.onError(errors)
   }
   /** Register END **/
 

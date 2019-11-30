@@ -4,10 +4,6 @@ import scala.util.Random
 
 package object controllers {
 
-  trait ControllerTrait {
-    def onError(errors: List[String])
-  }
-
   trait ViewTrait {
     def onError(errors: List[String]) : Route
   }
