@@ -11,9 +11,11 @@ lazy val dependency = new {
     val slick = "3.2.3"
   }
 
-  val scalaTest: ModuleID = "org.scalatest" %% "scalatest" % Version.scalaTest
+  val main: Seq[ModuleID] = Seq(
+    "org.scalatest" %% "scalatest" % Version.scalaTest
+  )
 
-  lazy val akka: Seq[ModuleID] = Seq(
+  val akka: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % Version.akka,
     "com.typesafe.akka" %% "akka-stream" % Version.akka,
     "com.typesafe.akka" %% "akka-testkit" % Version.akka % Test
@@ -71,7 +73,7 @@ lazy val model =
   Project(id = "model", base = file("model"))
     .settings(scalaSettings: _*)
     .settings(
-      libraryDependencies ++= dependency.slick ++ dependency.circe
+      libraryDependencies ++= dependency.slick ++ dependency.circe ++ dependency.akka ++ dependency.main
     )
 
 lazy val controller =

@@ -23,6 +23,8 @@ abstract class CrudRepository[A](query: TableQuery[_ <: Table[A]]) {
 abstract class BaseRepository[A <: HasId](query: TableQuery[_ <: Table[A] with BaseTable[A]]) extends CrudRepository[A](query) {
   def db: Database
 
+  def all: Future[Vector[A]] = db.run(query.to[Vector].result)
+
   def findById(id: Int): Future[Option[A]] = db.run(query.filter(_.id === id).result.headOption)
 
   def update(item: A): Future[Int] = db.run(query.filter(_.id === item.id).update(item))
