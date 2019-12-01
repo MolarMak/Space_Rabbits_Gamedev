@@ -98,7 +98,6 @@ class UserRepositoryTest
 
   "UserRepository" should "delete a single user by id" in {
     whenReady(repo.all) { users =>
-      print(users)
       whenReady(repo.deleteById(users(0).id)) { result =>
         result shouldBe 1
       }
