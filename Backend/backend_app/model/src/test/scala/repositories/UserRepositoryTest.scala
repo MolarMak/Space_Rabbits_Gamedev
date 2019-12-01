@@ -1,9 +1,10 @@
+package repositories
+
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import entities.User
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
-import repositories.UserRepository
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -107,13 +108,13 @@ class UserRepositoryTest
       }
 
       whenReady(repo.all)(_.size shouldBe 1)
-
-      print(users)
-      print(users(1))
-      whenReady(repo.deleteById(users(1).id)) { result =>
-        result shouldBe 1
-      }
-      whenReady(repo.all)(_.size shouldBe 0)
     }
+  }
+
+  "UserRepository" should "drop all records" in {
+    whenReady(repo.deleteAll) { res =>
+      res shouldBe 1
+    }
+    whenReady(repo.all)(_.size shouldBe 0)
   }
 }

@@ -1,7 +1,9 @@
+package repositories
+
 import slick.jdbc.JdbcProfile
 
 /**
-  * The root DB component which provides information
+  * The root repositories.DB component which provides information
   * how a driver has to be look -> Just a JDBC Profile
   */
 trait DB {
@@ -14,7 +16,7 @@ trait DB {
 }
 
 /**
-  * The final H2 in memory implementation which we can mixin
+  * The final repositories.H2 in memory implementation which we can mixin
   */
 trait H2 extends DB {
   override val driver: JdbcProfile = slick.jdbc.H2Profile

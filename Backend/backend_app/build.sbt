@@ -89,7 +89,7 @@ lazy val view =
     .dependsOn(controller)
     .settings(scalaSettings: _*)
     .settings(
-      libraryDependencies ++= dependency.akkaHttp
+      libraryDependencies ++= dependency.akkaHttp ++ dependency.akka ++ dependency.main
     )
 
 lazy val root =

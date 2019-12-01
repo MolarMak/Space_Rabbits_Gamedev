@@ -30,4 +30,6 @@ abstract class BaseRepository[A <: HasId](query: TableQuery[_ <: Table[A] with B
   def update(item: A): Future[Int] = db.run(query.filter(_.id === item.id).update(item))
 
   def deleteById(id: Int): Future[Int] = db.run(query.filter(_.id === id).delete)
+
+  def deleteAll: Future[Int] = db.run(query.delete)
 }
