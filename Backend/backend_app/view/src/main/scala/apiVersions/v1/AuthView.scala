@@ -1,15 +1,14 @@
 package apiVersions.v1
 
-import akka.http.scaladsl.model.StatusCodes._
-import akka.http.scaladsl.server.{Directives, Route}
+import akka.http.scaladsl.server.Route
+import apiVersions.BaseView
 import controllers.{AuthController, AuthControllerTrait, AuthViewTrait}
-import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport
 import io.circe.syntax._
 import models._
 import slick.jdbc.PostgresProfile.backend.Database
 import view.log
 
-class AuthView(private val db: Database) extends Directives with FailFastCirceSupport with AuthViewTrait {
+class AuthView(private val db: Database) extends BaseView with AuthViewTrait {
 
   private val controller: AuthControllerTrait = new AuthController(db, this)
 
@@ -53,11 +52,4 @@ class AuthView(private val db: Database) extends Directives with FailFastCirceSu
     complete(ResponseTrue().asJson)
   }
 
-  override def onAuthError(errors: List[String]): Route = {
-    complete((Unauthorized, ResponseFalse(result = false, errors)))
-  }
-
-  override def onError(errors: List[String]): Route = {
-    complete(ResponseFalse(result = false, errors).asJson)
-  }
 }

@@ -11,7 +11,7 @@ class FactTable(tag: Tag) extends Table[Fact](tag, "fact") with BaseTable[Fact] 
   val falseFact = column[String]("false_fact")
   val factVersion = column[Int]("fact_version")
 
-  def * = (id, fact, trueFact, falseFact, factVersion).mapTo[Fact]
+  def * = (id, fact, trueFact, falseFact, factVersion)<> ((Fact.apply _).tupled, Fact.unapply)
 }
 
 object FactTable {

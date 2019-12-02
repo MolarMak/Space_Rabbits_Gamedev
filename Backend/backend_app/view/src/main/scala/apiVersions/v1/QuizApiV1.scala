@@ -7,12 +7,15 @@ import slick.jdbc.PostgresProfile.backend.Database
 
 class QuizApiV1(private val db: Database) extends QuizApiTrait {
 
-  val authView = new AuthView(db)
+  private val authView = new AuthView(db)
+  private val factView = new FactView(db)
 
-  def login: Route = authView.login
+  override def login: Route = authView.login
 
-  def register: Route = authView.register
+  override def register: Route = authView.register
 
-  def logout: Route = authView.logout
+  override def logout: Route = authView.logout
+
+  override def synchronizeFacts: Route = factView.synchronizeFacts
 
 }

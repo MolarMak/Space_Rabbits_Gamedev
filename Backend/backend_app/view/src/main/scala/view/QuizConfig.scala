@@ -20,7 +20,7 @@ class QuizConfig(private val db: Database) extends Directives {
   }
 
   private def quizRoutes(quiz: QuizApiTrait) : Route = {
-    quiz.login ~ quiz.register ~ quiz.logout
+    quiz.login ~ quiz.register ~ quiz.logout ~ quiz.synchronizeFacts
   }
 
 }

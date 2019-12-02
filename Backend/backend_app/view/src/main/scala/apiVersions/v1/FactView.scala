@@ -1,0 +1,29 @@
+package apiVersions.v1
+
+import akka.http.scaladsl.server.Route
+import apiVersions.BaseView
+import controllers.{FactController, FactControllerTrait, FactViewTrait}
+import entities.Fact
+import models.{FactDataResponse, FactResponse}
+import slick.jdbc.PostgresProfile.backend.Database
+import view.log
+
+class FactView(private val db: Database) extends BaseView with FactViewTrait {
+
+  private val controller: FactControllerTrait = new FactController(db, this)
+
+  def synchronizeFacts: Route =
+    path("api" / apiVersion / "synchronizeFacts") {
+      get {
+        parameter(('version.as[Int], 'offset.as[Int], 'limit.as[Int])) { (version, offset, limit) =>
+          log("synchronizeFacts", s"input: $version $offset $limit")
+          controller.synchronizeFactsRoute(version, offset, limit)
+        }
+      }
+    }
+
+  override def onLoadFacts(facts: Vector[Fact], offset: Int, limit: Int, hasNext: Boolean): Route = {
+    complete(FactResponse(result = true, FactDataResponse(facts, offset, limit, hasNext)))
+  }
+
+}

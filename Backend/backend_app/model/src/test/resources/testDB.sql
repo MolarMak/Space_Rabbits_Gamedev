@@ -6,3 +6,13 @@ CREATE TABLE IF NOT EXISTS "user" (
 );
 
 DROP TABLE IF EXISTS "user";
+
+CREATE TABLE IF NOT EXISTS "fact" (
+  fact_id      int PRIMARY KEY,
+  fact         TEXT NOT NULL,
+  true_fact    TEXT NOT NULL,
+  false_fact   TEXT NOT NULL,
+  fact_version int  NOT NULL
+);
+
+DROP TABLE IF EXISTS "fact";
