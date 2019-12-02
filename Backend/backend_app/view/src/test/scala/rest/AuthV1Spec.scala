@@ -98,7 +98,7 @@ class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
       decode[LoginResponse](responseAs[String]) match {
         case Right(json) =>
           json.result shouldEqual true
-          logout(json.token)
+          logout(json.data.token)
         case _ => false shouldEqual true
       }
     }

@@ -41,11 +41,11 @@ class AuthView(private val db: Database) extends BaseView with AuthViewTrait {
     }
 
   override def onLogin(token: String): Route = {
-    complete(LoginResponse(result = true, token).asJson)
+    complete(LoginResponse(result = true, TokenResponse(token)).asJson)
   }
 
   override def onRegister(token: String): Route = {
-    complete(RegisterResponse(result = true, token).asJson)
+    complete(RegisterResponse(result = true, TokenResponse(token)).asJson)
   }
 
   override def onLogout: Route = {
