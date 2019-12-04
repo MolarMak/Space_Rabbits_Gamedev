@@ -1,9 +1,9 @@
 package controllers
 
 import akka.http.scaladsl.server.{Directives, Route}
-import entities.User
+import entities.{Statistic, User}
 import models.{LoginRequest, RegisterRequest}
-import repositories.UserRepository
+import repositories.{StatisticRepository, UserRepository}
 import slick.jdbc.PostgresProfile.backend.Database
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,6 +24,7 @@ trait AuthViewTrait extends ViewTrait {
 class AuthController(private val db: Database, private val view: AuthViewTrait) extends Directives with AuthControllerTrait {
 
   private val userRepository = new UserRepository(db)
+  private val statisticRepository = new StatisticRepository(db)
   private val errors = new Errors("en")
 
   /** Login START **/
@@ -70,6 +71,23 @@ class AuthController(private val db: Database, private val view: AuthViewTrait) 
     val user = User(1, registerRequest.login, registerRequest.password, token)
     val insertFuture = userRepository.insert(user)
     onComplete(insertFuture) {
+      case Success(1) => findUserIdByToken(token)
+      case _ => view.onError(List(errors.ERROR_REGISTRATION))
+    }
+  }
+
+  private def findUserIdByToken(token: String) : Route = {
+    val userIdFuture = userRepository.getUserIdByToken(token)
+    onComplete(userIdFuture) {
+      case Success(Some(userId)) => createUserStatistic(userId, token)
+      case _ => view.onError(List(errors.ERROR_REGISTRATION))
+    }
+  }
+
+  private def createUserStatistic(userId: Int, token: String) : Route = {
+    val statistic = Statistic(1, 0, 0, userId)
+    val insertStatisticFuture = statisticRepository.insert(statistic)
+    onComplete(insertStatisticFuture) {
       case Success(1) => view.onRegister(token)
       case _ => view.onError(List(errors.ERROR_REGISTRATION))
     }

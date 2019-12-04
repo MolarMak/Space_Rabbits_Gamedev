@@ -55,6 +55,40 @@ class UserRepositoryTest
     }
   }
 
+  "UserRepository" should "return user id on token" in {
+    whenReady(repo.all) { users =>
+      val user = users.find(_.token == "token1").get
+      whenReady(repo.getUserIdByToken(user.token)) {
+        case Some(userId) => userId shouldEqual user.id
+        case _ => true shouldEqual false
+      }
+    }
+  }
+
+  "UserRepository" should "load user profile data by token" in {
+    whenReady(repo.all) { users =>
+      val user = users.find(_.token == "token1").get
+      whenReady(repo.getUserProfileDataByToken(user.token)) {
+        case Some(login) => login shouldEqual user.login
+        case _ => true shouldEqual false
+      }
+    }
+  }
+
+  "UserRepository" should "check user token exists" in {
+    whenReady(repo.all) { users =>
+      val user = users.find(_.token == "token1").get
+      whenReady(repo.checkToken(user.token)) {
+        case true => true shouldEqual true
+        case _ => true shouldEqual false
+      }
+      whenReady(repo.checkToken("notToken")) {
+        case false => false shouldEqual false
+        case _ => true shouldEqual false
+      }
+    }
+  }
+
   /** test (checkAccount) function:
     * 1) Found user's token by login and pass
     * 2) Don't find user's token by login and pass

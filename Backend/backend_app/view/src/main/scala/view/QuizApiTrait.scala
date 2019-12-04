@@ -12,4 +12,6 @@ trait QuizApiTrait {
 
   def synchronizeFacts: Route
 
+  def loadScores: Route
+
 }

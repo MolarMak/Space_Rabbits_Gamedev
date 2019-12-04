@@ -18,4 +18,11 @@ class FactRepository(val db: Database)(implicit ec: ExecutionContext) extends Ba
         .result
     )
 
+  def countFacts: Future[Int] =
+    db.run(
+      FactTable.table
+        .length
+        .result
+    )
+
 }

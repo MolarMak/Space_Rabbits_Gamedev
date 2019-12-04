@@ -34,4 +34,30 @@ class UserRepository(val db: Database)(implicit ec: ExecutionContext) extends Ba
         .map(_.token)
         .update(newToken)
     )
+
+  def getUserIdByToken(token: String): Future[Option[Int]] =
+    db.run(
+      UserTable.table
+        .filter(_.token ===token)
+        .map(_.id)
+        .result
+        .headOption
+    )
+
+  def getUserProfileDataByToken(token: String): Future[Option[String]] =
+    db.run(
+      UserTable.table
+        .filter(_.token === token)
+        .map(_.login)
+        .result
+        .headOption
+    )
+
+  def checkToken(token: String): Future[Boolean] =
+    db.run(
+      UserTable.table
+        .filter(_.token === token)
+        .exists
+        .result
+    )
 }

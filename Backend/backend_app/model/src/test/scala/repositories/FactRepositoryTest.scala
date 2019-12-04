@@ -54,6 +54,11 @@ class FactRepositoryTest
     }
   }
 
+  "FactRepository" should "count number of facts in database" in {
+    whenReady(repo.countFacts) { number =>
+      number shouldEqual 20
+    }
+  }
 
   /** versions tests START**/
   "FactRepository" should "0 version, offset 0, limit 20, returns all facts" in {

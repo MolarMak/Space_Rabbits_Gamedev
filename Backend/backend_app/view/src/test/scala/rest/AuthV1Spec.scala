@@ -11,7 +11,7 @@ import slick.jdbc.PostgresProfile.api._
 import io.circe.syntax._
 import io.circe.parser.decode
 import org.scalatest.concurrent.ScalaFutures
-import repositories.UserRepository
+import repositories.{StatisticRepository, UserRepository}
 
 class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with ScalaFutures {
 
@@ -19,7 +19,8 @@ class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
   val errors = new Errors("en")
 
   val quizApi = new QuizApiV1(db)
-  val repo: UserRepository = new UserRepository(db)
+  val repoStatistic: StatisticRepository = new StatisticRepository(db)
+  val repoUser: UserRepository = new UserRepository(db)
 
   "register new user" in {
     val register = RegisterRequest("molarmaker", "12345678")
@@ -117,10 +118,18 @@ class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
   }
 
   "drop all records" in {
-    whenReady(repo.deleteAll) { res =>
-      res shouldBe 1
+    whenReady(repoStatistic.all) { stats =>
+      whenReady(repoStatistic.deleteAll) { res =>
+        res shouldBe stats.size
+      }
+      whenReady(repoStatistic.all)(_.size shouldBe 0)
     }
-    whenReady(repo.all)(_.size shouldBe 0)
+    whenReady(repoUser.all) { users =>
+      whenReady(repoUser.deleteAll) { res =>
+        res shouldBe users.size
+      }
+      whenReady(repoUser.all)(_.size shouldBe 0)
+    }
   }
 
 }

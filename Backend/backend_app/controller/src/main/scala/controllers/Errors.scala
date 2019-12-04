@@ -55,4 +55,27 @@ class Errors(private val language: String) {
   }
   /** Fact errors END **/
 
+
+  /** Profile errors START **/
+  def ERROR_READ_ID: String = language match {
+    case _ => "Read id must be >= 0"
+  }
+
+  def ERROR_LOAD_STATISTIC: String = language match {
+    case _ => "Can't load user statistic"
+  }
+
+  def ERROR_SAVE_STATISTIC: String = language match {
+    case _ => "Can't save user statistic"
+  }
+
+  def ERROR_LOAD_USER_DATA: String = language match {
+    case _ => "Can't load user data"
+  }
+
+  def ERROR_COUNT_FACTS: String = language match {
+    case _ => "Can't count facts"
+  }
+  /** Profile errors END **/
+
 }

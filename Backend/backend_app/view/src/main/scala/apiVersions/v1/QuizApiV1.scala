@@ -9,6 +9,7 @@ class QuizApiV1(private val db: Database) extends QuizApiTrait {
 
   private val authView = new AuthView(db)
   private val factView = new FactView(db)
+  private val profileView = new ProfileView(db)
 
   override def login: Route = authView.login
 
@@ -17,5 +18,7 @@ class QuizApiV1(private val db: Database) extends QuizApiTrait {
   override def logout: Route = authView.logout
 
   override def synchronizeFacts: Route = factView.synchronizeFacts
+
+  override def loadScores: Route = profileView.loadScores
 
 }
