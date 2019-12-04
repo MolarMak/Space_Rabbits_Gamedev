@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Success
 
 trait FactControllerTrait {
-  def synchronizeFactsRoute(version: Int, offset: Int, limit: Int) : Route
+  def synchroniseFactsRoute(version: Int, offset: Int, limit: Int) : Route
 }
 
 trait FactViewTrait extends ViewTrait {
@@ -22,7 +22,7 @@ class FactController(private val db: Database, private val view: FactViewTrait) 
   private val errors = new Errors("en")
 
   /** synchronize facts START **/
-  override def synchronizeFactsRoute(version: Int, offset: Int, limit: Int) : Route = {
+  override def synchroniseFactsRoute(version: Int, offset: Int, limit: Int) : Route = {
     val validate = factValidate(version, offset, limit)
     if(validate.nonEmpty) {
       view.onError(validate)
@@ -65,6 +65,5 @@ class FactController(private val db: Database, private val view: FactViewTrait) 
       (limitRule(limit), LimitValidation)
     ))
   }
-
   /** Validation END **/
 }

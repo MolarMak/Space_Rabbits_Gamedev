@@ -39,7 +39,7 @@ class FactV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
   }
 
   "version 0, offset 0(10,20), limit 10, load all" in {
-    Get("/api/v1/synchronizeFacts?version=0&offset=0&limit=10") ~> Route.seal(quizApi.synchronizeFacts) ~> check {
+    Get("/api/v1/synchroniseFacts?version=0&offset=0&limit=10") ~> Route.seal(quizApi.synchroniseFacts) ~> check {
       status shouldEqual StatusCodes.OK
       decode[FactResponse](responseAs[String]) match {
         case Right(json) =>
@@ -51,7 +51,7 @@ class FactV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
         case _ => false shouldEqual true
       }
     }
-    Get("/api/v1/synchronizeFacts?version=0&offset=10&limit=10") ~> Route.seal(quizApi.synchronizeFacts) ~> check {
+    Get("/api/v1/synchroniseFacts?version=0&offset=10&limit=10") ~> Route.seal(quizApi.synchroniseFacts) ~> check {
       status shouldEqual StatusCodes.OK
       decode[FactResponse](responseAs[String]) match {
         case Right(json) =>
@@ -63,7 +63,7 @@ class FactV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
         case _ => false shouldEqual true
       }
     }
-    Get("/api/v1/synchronizeFacts?version=0&offset=20&limit=10") ~> Route.seal(quizApi.synchronizeFacts) ~> check {
+    Get("/api/v1/synchroniseFacts?version=0&offset=20&limit=10") ~> Route.seal(quizApi.synchroniseFacts) ~> check {
       status shouldEqual StatusCodes.OK
       decode[FactResponse](responseAs[String]) match {
         case Right(json) =>
@@ -78,7 +78,7 @@ class FactV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
   }
 
   "version 1, offset 0(10), limit 10, load all version 2" in {
-    Get("/api/v1/synchronizeFacts?version=1&offset=0&limit=10") ~> Route.seal(quizApi.synchronizeFacts) ~> check {
+    Get("/api/v1/synchroniseFacts?version=1&offset=0&limit=10") ~> Route.seal(quizApi.synchroniseFacts) ~> check {
       status shouldEqual StatusCodes.OK
       decode[FactResponse](responseAs[String]) match {
         case Right(json) =>
@@ -91,7 +91,7 @@ class FactV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
         case _ => false shouldEqual true
       }
     }
-    Get("/api/v1/synchronizeFacts?version=1&offset=10&limit=10") ~> Route.seal(quizApi.synchronizeFacts) ~> check {
+    Get("/api/v1/synchroniseFacts?version=1&offset=10&limit=10") ~> Route.seal(quizApi.synchroniseFacts) ~> check {
       status shouldEqual StatusCodes.OK
       decode[FactResponse](responseAs[String]) match {
         case Right(json) =>

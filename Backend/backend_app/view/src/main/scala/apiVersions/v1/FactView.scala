@@ -12,12 +12,12 @@ class FactView(private val db: Database) extends BaseView with FactViewTrait {
 
   private val controller: FactControllerTrait = new FactController(db, this)
 
-  def synchronizeFacts: Route =
-    path("api" / apiVersion / "synchronizeFacts") {
+  def synchroniseFacts: Route =
+    path("api" / apiVersion / "synchroniseFacts") {
       get {
         parameter(('version.as[Int], 'offset.as[Int], 'limit.as[Int])) { (version, offset, limit) =>
-          log("synchronizeFacts", s"input: $version $offset $limit")
-          controller.synchronizeFactsRoute(version, offset, limit)
+          log("synchroniseFacts", s"input: $version $offset $limit")
+          controller.synchroniseFactsRoute(version, offset, limit)
         }
       }
     }

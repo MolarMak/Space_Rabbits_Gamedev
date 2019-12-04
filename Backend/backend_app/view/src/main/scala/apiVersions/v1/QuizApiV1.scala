@@ -17,7 +17,7 @@ class QuizApiV1(private val db: Database) extends QuizApiTrait {
 
   override def logout: Route = authView.logout
 
-  override def synchronizeFacts: Route = factView.synchronizeFacts
+  override def synchroniseFacts: Route = factView.synchroniseFacts
 
   override def loadScores: Route = profileView.loadScores
 

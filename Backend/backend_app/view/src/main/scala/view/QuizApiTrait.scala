@@ -10,7 +10,7 @@ trait QuizApiTrait {
 
   def logout: Route
 
-  def synchronizeFacts: Route
+  def synchroniseFacts: Route
 
   def loadScores: Route
 

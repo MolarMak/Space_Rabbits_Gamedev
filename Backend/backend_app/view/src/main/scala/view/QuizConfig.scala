@@ -23,7 +23,7 @@ class QuizConfig(private val db: Database) extends Directives {
     quiz.login ~
       quiz.register ~
       quiz.logout ~
-      quiz.synchronizeFacts ~
+      quiz.synchroniseFacts ~
       quiz.loadScores
   }
 
