@@ -6,7 +6,7 @@ import controllers.{ProfileController, ProfileControllerTrait, ProfileViewTrait}
 import entities.Statistic
 import models.{ProfileData, ProfileResponse}
 import slick.jdbc.PostgresProfile.backend.Database
-import view.log
+import controllers.log
 
 class ProfileView(private val db: Database) extends BaseView with ProfileViewTrait {
 
@@ -17,7 +17,7 @@ class ProfileView(private val db: Database) extends BaseView with ProfileViewTra
       get {
         headerValueByName("Authorization") { token =>
           parameter('readId.as[Int]) { readId =>
-            log("loadScores", s"input: $token $readId")
+            log("loadScores", s"input: $readId")
             controller.loadScoresController(token, readId)
           }
         }

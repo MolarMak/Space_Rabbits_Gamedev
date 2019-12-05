@@ -6,7 +6,7 @@ import repositories.FactRepository
 import slick.jdbc.PostgresProfile.backend.Database
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 trait FactControllerTrait {
   def synchroniseFactsRoute(version: Int, offset: Int, limit: Int) : Route
@@ -35,7 +35,12 @@ class FactController(private val db: Database, private val view: FactViewTrait) 
     val getAvailableFactsFuture = factRepository.getAllGreaterThanVersionLimitBy(version, offset, limit)
     onComplete(getAvailableFactsFuture) {
       case Success(facts) => view.onLoadFacts(facts, offset, limit, hasNext = facts.size == limit)
-      case _ => view.onError(List(errors.ERROR_LOAD_FACTS))
+      case Failure(exception) =>
+        errorLog("getAvailableFacts", s"v$version, offset $offset, limit $limit, ${exception.toString}")
+        view.onError(List(errors.ERROR_LOAD_FACTS))
+      case other =>
+        log("getAvailableFacts", s"v$version, offset $offset, limit $limit, ${other.toString}")
+        view.onError(List(errors.ERROR_LOAD_FACTS))
     }
   }
   /** synchronize facts END **/

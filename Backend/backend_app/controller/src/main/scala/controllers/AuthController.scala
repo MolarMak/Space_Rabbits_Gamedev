@@ -7,7 +7,7 @@ import repositories.{StatisticRepository, UserRepository}
 import slick.jdbc.PostgresProfile.backend.Database
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 trait AuthControllerTrait {
   def loginController(loginRequest: LoginRequest) : Route
@@ -41,7 +41,12 @@ class AuthController(private val db: Database, private val view: AuthViewTrait) 
     val checkAccountAvailableFuture = userRepository.checkAccount(loginRequest.login, loginRequest.password)
     onComplete(checkAccountAvailableFuture) {
       case Success(Some(token)) => view.onLogin(token)
-      case _ => view.onError(List(errors.ERROR_CAN_T_FIND_USER))
+      case Failure(exception) =>
+        errorLog("checkAvailableLogin", s"${loginRequest.login} ${exception.toString}")
+        view.onError(List(errors.ERROR_CAN_T_FIND_USER))
+      case other =>
+        log("checkAvailableLogin", s"${loginRequest.login} ${other.toString}")
+        view.onError(List(errors.ERROR_CAN_T_FIND_USER))
     }
   }
   /** Login END **/
@@ -62,7 +67,12 @@ class AuthController(private val db: Database, private val view: AuthViewTrait) 
     onComplete(checkAccountAvailableFuture) {
       case Success(true) => view.onError(List(errors.ERROR_USER_ALREADY_EXISTS))
       case Success(false) => saveUserData(registerRequest)
-      case some => println(some); view.onError(List(errors.ERROR_CAN_T_REGISTER_USER))
+      case Failure(exception) =>
+        errorLog("checkAvailableRegister", s"${registerRequest.login} ${exception.toString}")
+        view.onError(List(errors.ERROR_CAN_T_REGISTER_USER))
+      case other =>
+        log("checkAvailableRegister", s"${registerRequest.login} ${other.toString}")
+        view.onError(List(errors.ERROR_CAN_T_REGISTER_USER))
     }
   }
 
@@ -72,7 +82,12 @@ class AuthController(private val db: Database, private val view: AuthViewTrait) 
     val insertFuture = userRepository.insert(user)
     onComplete(insertFuture) {
       case Success(1) => findUserIdByToken(token)
-      case _ => view.onError(List(errors.ERROR_REGISTRATION))
+      case Failure(exception) =>
+        errorLog("saveUserData", s"${registerRequest.login} ${exception.toString}")
+        view.onError(List(errors.ERROR_REGISTRATION))
+      case other =>
+        log("saveUserData", s"${registerRequest.login} ${other.toString}")
+        view.onError(List(errors.ERROR_REGISTRATION))
     }
   }
 
@@ -80,7 +95,12 @@ class AuthController(private val db: Database, private val view: AuthViewTrait) 
     val userIdFuture = userRepository.getUserIdByToken(token)
     onComplete(userIdFuture) {
       case Success(Some(userId)) => createUserStatistic(userId, token)
-      case _ => view.onError(List(errors.ERROR_REGISTRATION))
+      case Failure(exception) =>
+        errorLog("findUserIdByToken", s"${exception.toString}")
+        view.onError(List(errors.ERROR_REGISTRATION))
+      case other =>
+        log("findUserIdByToken", s"${other.toString}")
+        view.onError(List(errors.ERROR_REGISTRATION))
     }
   }
 
@@ -89,7 +109,12 @@ class AuthController(private val db: Database, private val view: AuthViewTrait) 
     val insertStatisticFuture = statisticRepository.insert(statistic)
     onComplete(insertStatisticFuture) {
       case Success(1) => view.onRegister(token)
-      case _ => view.onError(List(errors.ERROR_REGISTRATION))
+      case Failure(exception) =>
+        errorLog("createUserStatistic", s"userId $userId ${exception.toString}")
+        view.onError(List(errors.ERROR_REGISTRATION))
+      case other =>
+        log("createUserStatistic", s"userId $userId ${other.toString}")
+        view.onError(List(errors.ERROR_REGISTRATION))
     }
   }
   /** Register END **/
@@ -102,7 +127,12 @@ class AuthController(private val db: Database, private val view: AuthViewTrait) 
     onComplete(logoutFuture) {
       case Success(1) => view.onLogout
       case Success(0) => view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
-      case _ => view.onError(List(errors.ERROR_WHEN_LOGOUT))
+      case Failure(exception) =>
+        errorLog("logoutController", s"${exception.toString}")
+        view.onError(List(errors.ERROR_WHEN_LOGOUT))
+      case other =>
+        log("logoutController", s"${other.toString}")
+        view.onError(List(errors.ERROR_WHEN_LOGOUT))
     }
   }
   /** Logout END **/

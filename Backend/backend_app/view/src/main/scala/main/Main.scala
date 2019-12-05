@@ -1,4 +1,4 @@
-package view
+package main
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.{Http, HttpExt}
@@ -7,6 +7,7 @@ import slick.jdbc.PostgresProfile.api._
 import scala.concurrent.duration._
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
+import controllers.log
 
 object Main {
 
@@ -19,9 +20,10 @@ object Main {
 
     val quizApi = new QuizConfig(db)
 
-    val bindingFuture = http.bindAndHandle(quizApi.routes, "0.0.0.0", 8080)
+    val bindingFuture = http.bindAndHandle(quizApi.routes, "0.0.0.0", 80)
 
     println("Server (version 1.0.1) is now online. Press RETURN to stop...")
+    log("main", "Server started")
     scala.io.StdIn.readLine()
     val stop = for {
       binding <- bindingFuture
@@ -31,6 +33,7 @@ object Main {
     Await.result(stop, 10.second)
     db.close()
     println("Server is offline...")
+    log("main", "Server stopped")
   }
 
 }

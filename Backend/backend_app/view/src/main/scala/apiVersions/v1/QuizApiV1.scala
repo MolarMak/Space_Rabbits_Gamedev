@@ -1,7 +1,7 @@
 package apiVersions.v1
 
 import akka.http.scaladsl.server.Route
-import view.QuizApiTrait
+import main.QuizApiTrait
 import slick.jdbc.PostgresProfile.backend.Database
 
 

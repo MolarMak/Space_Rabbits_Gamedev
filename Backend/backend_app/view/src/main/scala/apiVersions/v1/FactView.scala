@@ -6,7 +6,7 @@ import controllers.{FactController, FactControllerTrait, FactViewTrait}
 import entities.Fact
 import models.{FactDataResponse, FactResponse}
 import slick.jdbc.PostgresProfile.backend.Database
-import view.log
+import controllers.log
 
 class FactView(private val db: Database) extends BaseView with FactViewTrait {
 

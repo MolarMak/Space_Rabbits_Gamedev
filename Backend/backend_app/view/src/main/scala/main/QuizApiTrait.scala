@@ -1,4 +1,4 @@
-package view
+package main
 
 import akka.http.scaladsl.server.Route
 

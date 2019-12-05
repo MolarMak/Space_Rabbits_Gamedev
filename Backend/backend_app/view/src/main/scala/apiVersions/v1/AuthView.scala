@@ -6,7 +6,7 @@ import controllers.{AuthController, AuthControllerTrait, AuthViewTrait}
 import io.circe.syntax._
 import models._
 import slick.jdbc.PostgresProfile.backend.Database
-import view.log
+import controllers.log
 
 class AuthView(private val db: Database) extends BaseView with AuthViewTrait {
 
@@ -16,7 +16,7 @@ class AuthView(private val db: Database) extends BaseView with AuthViewTrait {
     path("api" / apiVersion / "login") {
       post {
         entity(as[LoginRequest]) { loginRequest =>
-          log("login", s"input: ${loginRequest.toString}")
+          log("login", s"input: ${loginRequest.login}")
           controller.loginController(loginRequest)
         }
       }
@@ -26,7 +26,7 @@ class AuthView(private val db: Database) extends BaseView with AuthViewTrait {
     path("api" / apiVersion / "register") {
       post {
         entity(as[RegisterRequest]) { registerRequest =>
-          log("register", s"input: ${registerRequest.toString}")
+          log("register", s"input: ${registerRequest.login}")
           controller.registerController(registerRequest)
         }
       }

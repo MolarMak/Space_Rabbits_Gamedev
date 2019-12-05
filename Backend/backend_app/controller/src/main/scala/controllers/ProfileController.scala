@@ -6,7 +6,7 @@ import repositories.{FactRepository, StatisticRepository, UserRepository}
 import slick.jdbc.PostgresProfile.backend.Database
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 trait ProfileControllerTrait {
   def loadScoresController(token: String, readOffline: Int) : Route
@@ -28,7 +28,12 @@ class ProfileController(private val db: Database, private val view: ProfileViewT
     val tokenValidateFuture = userRepository.checkToken(token)
     onComplete(tokenValidateFuture) {
       case Success(true) => validateReadOffline(token, readOffline)
-      case _ => view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
+      case Failure(exception) =>
+        errorLog("loadScoresController", s"${exception.toString}")
+        view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
+      case other =>
+        log("loadScoresController", s"${other.toString}")
+        view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
     }
   }
 
@@ -45,7 +50,12 @@ class ProfileController(private val db: Database, private val view: ProfileViewT
     val loadUserStatistic = statisticRepository.getUserStatistic(token)
     onComplete(loadUserStatistic) {
       case Success(Some(statistic)) => saveOfflineStatistic(token, readOffline, statistic.id)
-      case _ => view.onError(List(errors.ERROR_LOAD_STATISTIC))
+      case Failure(exception) =>
+        errorLog("loadUserStatistic", s"${exception.toString}")
+        view.onError(List(errors.ERROR_LOAD_STATISTIC))
+      case other =>
+        log("loadUserStatistic", s"${other.toString}")
+        view.onError(List(errors.ERROR_LOAD_STATISTIC))
     }
   }
 
@@ -53,7 +63,12 @@ class ProfileController(private val db: Database, private val view: ProfileViewT
     val updateOfflineStatistic = statisticRepository.updateOffline(statisticId, readOffline)
     onComplete(updateOfflineStatistic) {
       case Success(1) => reloadUserStatistic(token)
-      case _ => view.onError(List(errors.ERROR_SAVE_STATISTIC))
+      case Failure(exception) =>
+        errorLog("saveOfflineStatistic", s"${exception.toString}")
+        view.onError(List(errors.ERROR_SAVE_STATISTIC))
+      case other =>
+        log("saveOfflineStatistic", s"${other.toString}")
+        view.onError(List(errors.ERROR_SAVE_STATISTIC))
     }
   }
 
@@ -61,7 +76,12 @@ class ProfileController(private val db: Database, private val view: ProfileViewT
     val loadUserStatistic = statisticRepository.getUserStatistic(token)
     onComplete(loadUserStatistic) {
       case Success(Some(statistic)) => getUserData(token, statistic)
-      case _ => view.onError(List(errors.ERROR_LOAD_STATISTIC))
+      case Failure(exception) =>
+        errorLog("reloadUserStatistic", s"${exception.toString}")
+        view.onError(List(errors.ERROR_LOAD_STATISTIC))
+      case other =>
+        log("reloadUserStatistic", s"${other.toString}")
+        view.onError(List(errors.ERROR_LOAD_STATISTIC))
     }
   }
 
@@ -69,7 +89,12 @@ class ProfileController(private val db: Database, private val view: ProfileViewT
     val userDataFuture = userRepository.getUserProfileDataByToken(token)
     onComplete(userDataFuture) {
       case Success(Some(login)) => countFacts(statistic, login)
-      case _ => view.onError(List(errors.ERROR_LOAD_USER_DATA))
+      case Failure(exception) =>
+        errorLog("getUserData", s"${exception.toString}")
+        view.onError(List(errors.ERROR_LOAD_USER_DATA))
+      case other =>
+        log("getUserData", s"${other.toString}")
+        view.onError(List(errors.ERROR_LOAD_USER_DATA))
     }
   }
 
@@ -77,7 +102,12 @@ class ProfileController(private val db: Database, private val view: ProfileViewT
     val countFactFuture = factRepository.countFacts
     onComplete(countFactFuture) {
       case Success(factsCount) => view.onLoadScores(statistic, login, factsCount)
-      case _ => view.onError(List(errors.ERROR_COUNT_FACTS))
+      case Failure(exception) =>
+        errorLog("countFacts", s"${exception.toString}")
+        view.onError(List(errors.ERROR_COUNT_FACTS))
+      case other =>
+        log("countFacts", s"${other.toString}")
+        view.onError(List(errors.ERROR_COUNT_FACTS))
     }
   }
   /** Load scores END **/

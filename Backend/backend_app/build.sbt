@@ -51,6 +51,7 @@ lazy val dependency = new {
 val scalaSettings = Seq(
   version := "1.0.1",
   scalaVersion := "2.12.8",
+  test in assembly := {},
   addCompilerPlugin(
     "org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full
   ),
@@ -89,7 +90,8 @@ lazy val view =
     .dependsOn(controller)
     .settings(scalaSettings: _*)
     .settings(
-      libraryDependencies ++= dependency.akkaHttp ++ dependency.akka ++ dependency.main
+      libraryDependencies ++= dependency.akkaHttp ++ dependency.akka ++ dependency.main,
+      assemblyJarName in assembly := "quiz.jar"
     )
 
 lazy val root =
