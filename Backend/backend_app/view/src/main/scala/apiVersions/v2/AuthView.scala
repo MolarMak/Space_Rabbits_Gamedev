@@ -2,9 +2,11 @@ package apiVersions.v2
 
 import akka.http.scaladsl.server.Route
 import apiVersions.BaseView
-import controllers.{AuthController, AuthControllerTrait, AuthViewTrait, log}
+import controllers.v2.{AuthController, AuthControllerTrait, AuthViewTrait}
+import controllers.log
 import io.circe.syntax._
 import models._
+import models.v2.{LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, TokenResponse}
 import slick.jdbc.PostgresProfile.backend.Database
 
 class AuthView(private val db: Database) extends BaseView with AuthViewTrait {

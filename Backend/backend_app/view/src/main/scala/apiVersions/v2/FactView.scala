@@ -2,9 +2,10 @@ package apiVersions.v2
 
 import akka.http.scaladsl.server.Route
 import apiVersions.BaseView
-import controllers.{FactController, FactControllerTrait, FactViewTrait, log}
+import controllers.v2.{FactController, FactControllerTrait, FactViewTrait}
+import controllers.log
 import entities.Fact
-import models.{FactDataResponse, FactResponse}
+import models.v2.{FactDataResponse, FactResponse}
 import slick.jdbc.PostgresProfile.backend.Database
 
 class FactView(private val db: Database) extends BaseView with FactViewTrait {

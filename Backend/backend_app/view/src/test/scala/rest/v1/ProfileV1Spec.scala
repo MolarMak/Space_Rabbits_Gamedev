@@ -9,7 +9,7 @@ import controllers.Errors
 import entities.Fact
 import io.circe.parser.decode
 import io.circe.syntax._
-import models._
+import models.v1.{LoginRequest, LoginResponse, ProfileResponse, RegisterRequest, RegisterResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
 import repositories.{FactRepository, StatisticRepository, UserRepository}

@@ -7,7 +7,7 @@ import apiVersions.v2.QuizApiV2
 import controllers.Errors
 import entities.Fact
 import io.circe.parser.decode
-import models.FactResponse
+import models.v2.FactResponse
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
 import repositories.FactRepository

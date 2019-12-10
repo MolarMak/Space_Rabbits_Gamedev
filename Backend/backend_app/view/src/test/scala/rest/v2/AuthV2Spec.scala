@@ -8,6 +8,7 @@ import controllers.Errors
 import io.circe.parser.decode
 import io.circe.syntax._
 import models._
+import models.v2.{LoginRequest, LoginResponse, RegisterRequest, RegisterResponse}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
 import repositories.{StatisticRepository, UserRepository}

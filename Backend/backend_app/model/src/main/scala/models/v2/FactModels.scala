@@ -1,4 +1,4 @@
-package models
+package models.v2
 
 import entities.Fact
 import io.circe.generic.JsonCodec

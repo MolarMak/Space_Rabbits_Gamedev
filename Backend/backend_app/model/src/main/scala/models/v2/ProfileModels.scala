@@ -1,4 +1,4 @@
-package models
+package models.v2
 
 import io.circe.generic.JsonCodec
 

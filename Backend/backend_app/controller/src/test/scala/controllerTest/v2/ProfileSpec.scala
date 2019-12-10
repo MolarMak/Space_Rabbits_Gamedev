@@ -1,7 +1,8 @@
-package controllerTest
+package controllerTest.v2
 
 import akka.http.scaladsl.server.Route
-import controllers.{Errors, ProfileController, ProfileViewTrait}
+import controllers.Errors
+import controllers.v2.{ProfileController, ProfileViewTrait}
 import entities.Statistic
 import org.scalatest.{Matchers, WordSpec}
 import slick.jdbc.PostgresProfile.api._

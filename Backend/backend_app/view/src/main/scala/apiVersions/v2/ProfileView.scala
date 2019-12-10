@@ -2,9 +2,10 @@ package apiVersions.v2
 
 import akka.http.scaladsl.server.Route
 import apiVersions.BaseView
-import controllers.{ProfileController, ProfileControllerTrait, ProfileViewTrait, log}
+import controllers.v2.{ProfileController, ProfileControllerTrait, ProfileViewTrait}
+import controllers.log
 import entities.Statistic
-import models.{ProfileData, ProfileResponse}
+import models.v2.{ProfileData, ProfileResponse}
 import slick.jdbc.PostgresProfile.backend.Database
 
 class ProfileView(private val db: Database) extends BaseView with ProfileViewTrait {

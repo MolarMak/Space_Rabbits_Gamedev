@@ -1,8 +1,9 @@
-package controllers
+package controllers.v1
 
 import akka.http.scaladsl.server.{Directives, Route}
+import controllers._
 import entities.{Statistic, User}
-import models.{LoginRequest, RegisterRequest}
+import models.v1.{LoginRequest, RegisterRequest}
 import repositories.{StatisticRepository, UserRepository}
 import slick.jdbc.PostgresProfile.backend.Database
 
