@@ -1,24 +1,25 @@
-package rest
+package rest.v2
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import apiVersions.v1.QuizApiV1
+import apiVersions.v2.QuizApiV2
 import controllers.Errors
-import models.{LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, ResponseFalse, ResponseTrue}
-import org.scalatest.{Matchers, WordSpec}
-import slick.jdbc.PostgresProfile.api._
-import io.circe.syntax._
 import io.circe.parser.decode
+import io.circe.syntax._
+import models._
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{Matchers, WordSpec}
 import repositories.{StatisticRepository, UserRepository}
+import slick.jdbc.PostgresProfile.api._
 
-class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with ScalaFutures {
+class AuthV2Spec extends WordSpec with Matchers with ScalatestRouteTest with ScalaFutures {
 
   val db = Database.forConfig("database")
   val errors = new Errors("en")
 
-  val quizApi = new QuizApiV1(db)
+  val quizApi = new QuizApiV2(db)
+  val apiVersion = "v2"
   val repoStatistic: StatisticRepository = new StatisticRepository(db)
   val repoUser: UserRepository = new UserRepository(db)
 
@@ -26,7 +27,7 @@ class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
     val register = RegisterRequest("molarmaker", "12345678")
     val requestEntity = HttpEntity(ContentTypes.`application/json`, register.asJson.toString())
 
-    Post("/api/v1/register", requestEntity) ~> Route.seal(quizApi.register) ~> check {
+    Post(s"/api/$apiVersion/register", requestEntity) ~> Route.seal(quizApi.register) ~> check {
       status shouldEqual StatusCodes.OK
       decode[RegisterResponse](responseAs[String]) match {
         case Right(json) => json.result shouldEqual true
@@ -39,7 +40,7 @@ class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
     val register = RegisterRequest("molarmaker", "12345678")
     val requestEntity = HttpEntity(ContentTypes.`application/json`, register.asJson.toString())
 
-    Post("/api/v1/register", requestEntity) ~> Route.seal(quizApi.register) ~> check {
+    Post(s"/api/$apiVersion/register", requestEntity) ~> Route.seal(quizApi.register) ~> check {
       status shouldEqual StatusCodes.OK
       decode[ResponseFalse](responseAs[String]) match {
         case Right(json) =>
@@ -55,7 +56,7 @@ class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
     val login = LoginRequest("molarmaker", "12345678")
     val requestEntity = HttpEntity(ContentTypes.`application/json`, login.asJson.toString())
 
-    Post("/api/v1/login", requestEntity) ~> Route.seal(quizApi.login) ~> check {
+    Post(s"/api/$apiVersion/login", requestEntity) ~> Route.seal(quizApi.login) ~> check {
       status shouldEqual StatusCodes.OK
       decode[LoginResponse](responseAs[String]) match {
         case Right(json) => json.result shouldEqual true
@@ -68,7 +69,7 @@ class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
     val login = LoginRequest("molarmaker", "123456789")
     val requestEntity = HttpEntity(ContentTypes.`application/json`, login.asJson.toString())
 
-    Post("/api/v1/login", requestEntity) ~> Route.seal(quizApi.login) ~> check {
+    Post(s"/api/$apiVersion/login", requestEntity) ~> Route.seal(quizApi.login) ~> check {
       status shouldEqual StatusCodes.OK
       decode[ResponseFalse](responseAs[String]) match {
         case Right(json) =>
@@ -85,7 +86,7 @@ class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
     val requestEntity = HttpEntity(ContentTypes.`application/json`, login.asJson.toString())
 
     def logout(token: String) = {
-      Get(s"/api/v1/logout?token=$token") ~> Route.seal(quizApi.logout) ~> check {
+      Get(s"/api/$apiVersion/logout?token=$token") ~> Route.seal(quizApi.logout) ~> check {
         status shouldEqual StatusCodes.OK
         decode[ResponseTrue](responseAs[String]) match {
           case Right(json) => json.result shouldEqual true
@@ -94,7 +95,7 @@ class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
       }
     }
 
-    Post("/api/v1/login", requestEntity) ~> Route.seal(quizApi.login) ~> check {
+    Post(s"/api/$apiVersion/login", requestEntity) ~> Route.seal(quizApi.login) ~> check {
       status shouldEqual StatusCodes.OK
       decode[LoginResponse](responseAs[String]) match {
         case Right(json) =>
@@ -106,7 +107,7 @@ class AuthV1Spec extends WordSpec with Matchers with ScalatestRouteTest with Sca
   }
 
   "user not found when logout (token not valid)" in {
-    Get(s"/api/v1/logout?token=wrongToken") ~> Route.seal(quizApi.logout) ~> check {
+    Get(s"/api/$apiVersion/logout?token=wrongToken") ~> Route.seal(quizApi.logout) ~> check {
       status shouldEqual StatusCodes.Unauthorized
       decode[ResponseFalse](responseAs[String]) match {
         case Right(json) =>

@@ -1,4 +1,4 @@
-package rest
+package rest.v1
 
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
@@ -7,13 +7,13 @@ import akka.http.scaladsl.testkit.ScalatestRouteTest
 import apiVersions.v1.QuizApiV1
 import controllers.Errors
 import entities.Fact
-import models.{LoginRequest, LoginResponse, ProfileResponse, RegisterRequest, RegisterResponse}
-import org.scalatest.{Matchers, WordSpec}
+import io.circe.parser.decode
+import io.circe.syntax._
+import models._
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{Matchers, WordSpec}
 import repositories.{FactRepository, StatisticRepository, UserRepository}
 import slick.jdbc.PostgresProfile.api._
-import io.circe.syntax._
-import io.circe.parser.decode
 
 class ProfileV1Spec extends WordSpec with Matchers with ScalatestRouteTest with ScalaFutures {
 
