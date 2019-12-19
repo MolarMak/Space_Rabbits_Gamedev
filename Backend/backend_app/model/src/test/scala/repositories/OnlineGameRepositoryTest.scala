@@ -26,10 +26,10 @@ class OnlineGameRepositoryTest
 
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(5 seconds)
 
-  def createEmptyOnlineGame(creatorUserId: Int) : OnlineGame = {
+  def createEmptyOnlineGame : OnlineGame = {
     //not to change harcoded string (need to test data consistency)
     val factsString = "[{\"id\":1,\"fact\":\"fact1\",\"trueFact\":\"trueFact1\",\"falseFact\":\"falseFact1\",\"factVersion\":2},{\"id\":2,\"fact\":\"fact2\",\"trueFact\":\"trueFact2\",\"falseFact\":\"falseFact2\",\"factVersion\":1},{\"id\":3,\"fact\":\"fact3\",\"trueFact\":\"trueFact3\",\"falseFact\":\"falseFact3\",\"factVersion\":2},{\"id\":4,\"fact\":\"fact4\",\"trueFact\":\"trueFact4\",\"falseFact\":\"falseFact4\",\"factVersion\":1},{\"id\":5,\"fact\":\"fact5\",\"trueFact\":\"trueFact5\",\"falseFact\":\"falseFact5\",\"factVersion\":2}]"
-    return OnlineGame(1, "test1", creatorUserId, None, factsString, List(0,0,0,0,0).asJson.noSpaces, List(0,0,0,0,0).asJson.noSpaces, 0)
+    return OnlineGame(1, "test1", None, None, factsString, List(0,0,0,0,0).asJson.noSpaces, List(0,0,0,0,0).asJson.noSpaces, isGameStarted = false, 0)
   }
 
   "OnlineGameRepositoryTest" should "handle a in memory database" in {
@@ -47,16 +47,12 @@ class OnlineGameRepositoryTest
         result shouldBe 1
       }
     }
-    whenReady(repoUser.getUserIdByToken("token1")) {
-      case Some(userId) =>
-        whenReady(repo.insert(createEmptyOnlineGame(userId))) { result =>
-          result shouldBe 1
-        }
-      case _ => false shouldEqual true
+    whenReady(repo.insert(createEmptyOnlineGame)) { result =>
+      result shouldBe 1
     }
   }
 
-  "OnlineGameRepositoryTest" should "search for game with free spot" in {
+  "OnlineGameRepositoryTest" should "search for game with free spot for second user" in {
     whenReady(repo.searchFreeGameSpot) {
       case Some(game) =>
         whenReady(repoUser.getUserIdByToken("token2")) {

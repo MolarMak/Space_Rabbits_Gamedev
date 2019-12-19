@@ -2,6 +2,13 @@ package controllers
 
 class Errors(private val language: String) {
 
+  /** Common START **/
+  def ERROR_UPDATE_API_VERSION(version: String): String = language match {
+    case _ => s"Please, update to version $version"
+  }
+
+  /** Common END **/
+
   /** Auth errors START **/
   def ERROR_NAME_LENGTH: String = language match {
     case _ => "Name length must be between 2 and 30 characters"
@@ -77,5 +84,13 @@ class Errors(private val language: String) {
     case _ => "Can't count facts"
   }
   /** Profile errors END **/
+
+
+  /** Online Game errors START **/
+  def ERROR_GAME_ROOM_OPEN: String = language match {
+    case _ => "Can't open new game room"
+  }
+
+  /** Online Game errors END **/
 
 }

@@ -14,4 +14,6 @@ trait QuizApiTrait {
 
   def loadScores: Route
 
+  def onlineGameRoom: Route
+
 }

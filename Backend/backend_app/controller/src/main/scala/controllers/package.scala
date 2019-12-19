@@ -39,6 +39,11 @@ package object controllers {
     randomString("abcdefghijklmnopqrstuvwxyz0123456789", random)(32)
   }
 
+  def generateGameRoomId(): String = {
+    val random = new scala.util.Random
+    randomString("abcdefghijklmnopqrstuvwxyz0123456789", random)(24)
+  }
+
   def log(methodName: String, message: String): Unit = {
     if(isLogged) {
       writeToLogFile("log", s"$methodName => $message")

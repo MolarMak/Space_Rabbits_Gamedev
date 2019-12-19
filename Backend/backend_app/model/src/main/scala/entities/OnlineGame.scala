@@ -15,4 +15,4 @@ import repositories.HasId
   * @param winner - 0 is unfinished 1 is first player, 2 is second player, 3 is draw
   */
 @JsonCodec
-case class OnlineGame(id: Int, gameRoomId: String, player1Id: Int, player2Id: Option[Int], questionsList: String, answersPlayer1List: String, answersPlayer2List: String, winner: Int) extends HasId
+case class OnlineGame(id: Int, gameRoomId: String, player1Id: Option[Int], player2Id: Option[Int], questionsList: String, answersPlayer1List: String, answersPlayer2List: String, isGameStarted: Boolean, winner: Int) extends HasId
