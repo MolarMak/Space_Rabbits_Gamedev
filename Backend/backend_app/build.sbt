@@ -4,8 +4,9 @@
 lazy val dependency = new {
 
   object Version {
-    val akka = "2.5.18"
+    val akka = "2.6.1"
     val akkaHttp = "10.1.5"
+    val akkaExperimentalVersion = "2.4.10"
     val circeVersion = "0.9.3"
     val scalaTest = "3.0.5"
     val slick = "3.2.3"
@@ -41,6 +42,13 @@ lazy val dependency = new {
     "org.postgresql" % "postgresql" % "9.4.1211",
     "com.h2database" % "h2" % "1.4.192" % "test",
     "org.slf4j" % "slf4j-nop" % "1.6.4"
+  )
+  
+  val scalaExperimental: Seq[ModuleID] = Seq(
+    "com.typesafe.akka" %% "akka-stream-experimental" % Version.akkaExperimentalVersion,
+    "com.typesafe.akka" %% "akka-http-core-experimental" % Version.akkaExperimentalVersion,
+    "com.typesafe.akka" %% "akka-http-experimental" % Version.akkaExperimentalVersion,
+    "org.java-websocket" % "Java-WebSocket" % "1.3.0"
   )
 }
 
@@ -90,7 +98,7 @@ lazy val view =
     .dependsOn(controller)
     .settings(scalaSettings: _*)
     .settings(
-      libraryDependencies ++= dependency.akkaHttp ++ dependency.akka ++ dependency.main,
+      libraryDependencies ++= dependency.akkaHttp ++ dependency.akka ++ dependency.scalaExperimental ++ dependency.main,
       assemblyJarName in assembly := "quiz.jar"
     )
 
