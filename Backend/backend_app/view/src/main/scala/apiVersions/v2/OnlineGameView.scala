@@ -22,6 +22,14 @@ class OnlineGameView(private val db: Database) extends BaseView with OnlineGameV
     }
   }
 
+  def wsEcho: Route = {
+    path("api" / apiVersion / "wsEcho") {
+      get {
+        handleWebSocketMessages(controller.echoService)
+      }
+    }
+  }
+
   override def onStartOnlineGame(gameRoomId: String) : Route = {
     complete(StartGameResponse(result = true, gameRoomId))
   }

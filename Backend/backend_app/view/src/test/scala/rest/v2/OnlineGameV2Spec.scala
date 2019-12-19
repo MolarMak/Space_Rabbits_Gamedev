@@ -3,7 +3,7 @@ package rest.v2
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.testkit.ScalatestRouteTest
+import akka.http.scaladsl.testkit.{ScalatestRouteTest, WSProbe}
 import apiVersions.v2.QuizApiV2
 import controllers.Errors
 import entities.Fact
@@ -88,6 +88,21 @@ class OnlineGameV2Spec extends WordSpec with Matchers with ScalatestRouteTest wi
           getOnlineGameRoom(json.data.token)
         case _ => false shouldEqual true
       }
+    }
+  }
+
+  "echo ws test" in {
+    val wsClient = WSProbe()
+
+    WS(s"/api/$apiVersion/wsEcho", wsClient.flow) ~> quizApi.wsEcho ~> check {
+      // check response for WS Upgrade headers
+      isWebSocketUpgrade shouldEqual true
+
+      wsClient.sendMessage("Hello!")
+      wsClient.expectMessage("ECHO: Hello!")
+
+      wsClient.sendMessage("How are you?")
+      wsClient.expectMessage("ECHO: How are you?")
     }
   }
 

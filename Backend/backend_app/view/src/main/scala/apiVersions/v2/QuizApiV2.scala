@@ -22,4 +22,7 @@ class QuizApiV2(private val db: Database) extends QuizApiTrait {
   override def loadScores: Route = profileView.loadScores
 
   override def onlineGameRoom: Route = onlineGameView.onlineGameRoom
+
+  override def wsEcho: Route = onlineGameView.wsEcho
+
 }

@@ -1,6 +1,8 @@
 package controllers.v2
 
+import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.http.scaladsl.server.{Directives, Route}
+import akka.stream.scaladsl.Flow
 import controllers.{Errors, ViewTrait, errorLog, log, _}
 import entities.{Fact, OnlineGame}
 import repositories.{FactRepository, OnlineGameRepository, UserRepository}
@@ -12,6 +14,7 @@ import io.circe.syntax._
 
 trait OnlineGameControllerTrait {
   def startOnlineGameRoute(token: String) : Route
+  def echoService: Flow[Message, Message, _]
 }
 
 trait OnlineGameViewTrait extends ViewTrait {
@@ -25,6 +28,8 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
   private val onlineGameRepository = new OnlineGameRepository(db)
   val errors = new Errors("en")
 
+
+  /** Create game room START **/
   override def startOnlineGameRoute(token: String): Route = {
     val tokenValidateFuture = userRepository.checkToken(token)
     onComplete(tokenValidateFuture) {
@@ -78,5 +83,14 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
         view.onError(List(errors.ERROR_GAME_ROOM_OPEN))
     }
   }
+  /** Create game room END **/
+
+
+  /** WS echo START **/
+  def echoService: Flow[Message, Message, _] = Flow[Message].map {
+    case TextMessage.Strict(txt) => TextMessage("ECHO: " + txt)
+    case _ => TextMessage("Message type unsupported")
+  }
+  /** WS echo END **/
 
 }
