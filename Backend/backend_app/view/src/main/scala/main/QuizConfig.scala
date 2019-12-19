@@ -26,7 +26,8 @@ class QuizConfig(private val db: Database) extends Directives {
       quiz.logout ~
       quiz.synchroniseFacts ~
       quiz.loadScores ~
-      quiz.onlineGameRoom
+      quiz.onlineGameRoom ~
+      quiz.wsEcho
   }
 
 }

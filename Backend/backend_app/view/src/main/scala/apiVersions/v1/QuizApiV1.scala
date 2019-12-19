@@ -2,6 +2,7 @@ package apiVersions.v1
 
 import akka.http.scaladsl.server.Route
 import apiVersions.UpdateVersionView
+import apiVersions.v2.OnlineGameView
 import main.QuizApiTrait
 import slick.jdbc.PostgresProfile.backend.Database
 
@@ -11,8 +12,7 @@ class QuizApiV1(private val db: Database) extends QuizApiTrait {
   private val authView = new AuthView(db)
   private val factView = new FactView(db)
   private val profileView = new ProfileView(db)
-
-  private val updateVersionView = new UpdateVersionView()
+  private val onlineGameView = new OnlineGameView(db)
 
   override def login: Route = authView.login
 
@@ -24,7 +24,7 @@ class QuizApiV1(private val db: Database) extends QuizApiTrait {
 
   override def loadScores: Route = profileView.loadScores
 
-  override def onlineGameRoom: Route = updateVersionView.updateVersion(apiVersions.v2.apiVersion)
+  override def onlineGameRoom: Route = onlineGameView.onlineGameRoom
 
-  override def wsEcho: Route = updateVersionView.updateVersion(apiVersions.v2.apiVersion)
+  override def wsEcho: Route = onlineGameView.wsEcho
 }
