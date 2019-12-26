@@ -8,6 +8,8 @@ target 'iOS-Template' do
   # Pods for iOS-Template
   
   pod "SwiftKeychainWrapper"
+  pod "IQKeyboardManager"
+  pod "Koloda"
   pod "SwiftLint"
 
 end
