@@ -1,20 +1,32 @@
 PODS:
+  - IQKeyboardManager (6.5.4)
+  - Koloda (5.0):
+    - pop (~> 1.0)
+  - pop (1.0.12)
   - SwiftKeychainWrapper (3.4.0)
   - SwiftLint (0.38.0)
 
 DEPENDENCIES:
+  - IQKeyboardManager
+  - Koloda
   - SwiftKeychainWrapper
   - SwiftLint
 
 SPEC REPOS:
   trunk:
+    - IQKeyboardManager
+    - Koloda
+    - pop
     - SwiftKeychainWrapper
     - SwiftLint
 
 SPEC CHECKSUMS:
+  IQKeyboardManager: 72b359cd7e777e3a984cedbe05f8da45320cbb63
+  Koloda: 75302d21882cc3e274c1561b1155805ea5919dab
+  pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
   SwiftKeychainWrapper: 6fc49fbf7d4a6b0772917acb0e53a1639f6078d6
   SwiftLint: 4105f061f9812b214568b736dab580ab2c73a582
 
-PODFILE CHECKSUM: d3e51de481e9121b874d0c7addf59dcc86339069
+PODFILE CHECKSUM: 14893c897a1648281841c574db38d489ffa3e9f7
 
 COCOAPODS: 1.8.4
