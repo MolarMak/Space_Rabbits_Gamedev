@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		98A7BE66DA02B4642297E202 /* Pods_iOS_Template.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F46F83D8DA10B10EB7671890 /* Pods_iOS_Template.framework */; };
+		164E36E8A5B6800A3E556583 /* Pods_QuizApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61AA8CA19BD27A871496BC67 /* Pods_QuizApp.framework */; };
 		FA06B58123A7C6C300DC1D3D /* FactsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA06B58023A7C6C300DC1D3D /* FactsStore.swift */; };
 		FA226A7223ADA7E80048E1B9 /* SearchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA226A7123ADA7E80048E1B9 /* SearchVC.swift */; };
 		FA226A7423AE10950048E1B9 /* GameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA226A7323AE10950048E1B9 /* GameVC.swift */; };
@@ -39,8 +39,10 @@
 
 /* Begin PBXFileReference section */
 		176721F134BD055C6B4EFAFF /* Pods-iOS-Template.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-Template.release.xcconfig"; path = "Target Support Files/Pods-iOS-Template/Pods-iOS-Template.release.xcconfig"; sourceTree = "<group>"; };
+		61AA8CA19BD27A871496BC67 /* Pods_QuizApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_QuizApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		813FD478F3B00BFF2F537FB7 /* Pods-iOS-Template.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iOS-Template.debug.xcconfig"; path = "Target Support Files/Pods-iOS-Template/Pods-iOS-Template.debug.xcconfig"; sourceTree = "<group>"; };
-		F46F83D8DA10B10EB7671890 /* Pods_iOS_Template.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iOS_Template.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A5E0FA3D845CEFC514CD9A1 /* Pods-QuizApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuizApp.debug.xcconfig"; path = "Target Support Files/Pods-QuizApp/Pods-QuizApp.debug.xcconfig"; sourceTree = "<group>"; };
+		AEF3D2FB530CB0BE5DE07BF1 /* Pods-QuizApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-QuizApp.release.xcconfig"; path = "Target Support Files/Pods-QuizApp/Pods-QuizApp.release.xcconfig"; sourceTree = "<group>"; };
 		FA06B58023A7C6C300DC1D3D /* FactsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactsStore.swift; sourceTree = "<group>"; };
 		FA226A7123ADA7E80048E1B9 /* SearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVC.swift; sourceTree = "<group>"; };
 		FA226A7323AE10950048E1B9 /* GameVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameVC.swift; sourceTree = "<group>"; };
@@ -77,7 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				98A7BE66DA02B4642297E202 /* Pods_iOS_Template.framework in Frameworks */,
+				164E36E8A5B6800A3E556583 /* Pods_QuizApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,7 +89,7 @@
 		8E35057B0A8F134272047B20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				F46F83D8DA10B10EB7671890 /* Pods_iOS_Template.framework */,
+				61AA8CA19BD27A871496BC67 /* Pods_QuizApp.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -97,6 +99,8 @@
 			children = (
 				813FD478F3B00BFF2F537FB7 /* Pods-iOS-Template.debug.xcconfig */,
 				176721F134BD055C6B4EFAFF /* Pods-iOS-Template.release.xcconfig */,
+				8A5E0FA3D845CEFC514CD9A1 /* Pods-QuizApp.debug.xcconfig */,
+				AEF3D2FB530CB0BE5DE07BF1 /* Pods-QuizApp.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -329,7 +333,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-iOS-Template-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-QuizApp-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -342,15 +346,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-iOS-Template/Pods-iOS-Template-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-QuizApp/Pods-QuizApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-iOS-Template/Pods-iOS-Template-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-QuizApp/Pods-QuizApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-iOS-Template/Pods-iOS-Template-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-QuizApp/Pods-QuizApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FA4C575B23A1587500A92C1B /* ShellScript */ = {
@@ -532,7 +536,7 @@
 		};
 		FA4C573D23A1448C00A92C1B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 813FD478F3B00BFF2F537FB7 /* Pods-iOS-Template.debug.xcconfig */;
+			baseConfigurationReference = 8A5E0FA3D845CEFC514CD9A1 /* Pods-QuizApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -552,7 +556,7 @@
 		};
 		FA4C573E23A1448C00A92C1B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 176721F134BD055C6B4EFAFF /* Pods-iOS-Template.release.xcconfig */;
+			baseConfigurationReference = AEF3D2FB530CB0BE5DE07BF1 /* Pods-QuizApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
