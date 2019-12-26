@@ -3,12 +3,14 @@ PODS:
   - Koloda (5.0):
     - pop (~> 1.0)
   - pop (1.0.12)
+  - Starscream (3.1.1)
   - SwiftKeychainWrapper (3.4.0)
   - SwiftLint (0.38.0)
 
 DEPENDENCIES:
   - IQKeyboardManager
   - Koloda
+  - Starscream
   - SwiftKeychainWrapper
   - SwiftLint
 
@@ -17,6 +19,7 @@ SPEC REPOS:
     - IQKeyboardManager
     - Koloda
     - pop
+    - Starscream
     - SwiftKeychainWrapper
     - SwiftLint
 
@@ -24,9 +27,10 @@ SPEC CHECKSUMS:
   IQKeyboardManager: 72b359cd7e777e3a984cedbe05f8da45320cbb63
   Koloda: 75302d21882cc3e274c1561b1155805ea5919dab
   pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
+  Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
   SwiftKeychainWrapper: 6fc49fbf7d4a6b0772917acb0e53a1639f6078d6
   SwiftLint: 4105f061f9812b214568b736dab580ab2c73a582
 
-PODFILE CHECKSUM: 14893c897a1648281841c574db38d489ffa3e9f7
+PODFILE CHECKSUM: 65807cfc90353c3c32156ac3bf5d3e4e6495cff8
 
 COCOAPODS: 1.8.4
