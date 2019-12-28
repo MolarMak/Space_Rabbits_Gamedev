@@ -170,7 +170,7 @@ class NetworkingService {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         if let token = User.current?.token {
             print("Using token:", token)
-            request.addValue("Bearer " + token, forHTTPHeaderField: "Authorization")
+            request.addValue(token, forHTTPHeaderField: "Authorization")
         } else {
             print("No token")
         }

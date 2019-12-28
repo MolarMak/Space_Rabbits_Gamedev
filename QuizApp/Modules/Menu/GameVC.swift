@@ -17,6 +17,13 @@ class GameVC: UIViewController {
     @IBOutlet weak var oponentProgressContainer: UIView!
     @IBOutlet weak var myProgressContainer: UIView!
     
+    var roomId: String!
+    var timer: Timer?
+    var questions: [GameRoomInfoQuestion]?
+    
+    var mySubviews = [UIView]()
+    var oponentSubviews = [UIView]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -24,32 +31,37 @@ class GameVC: UIViewController {
         kolodaView.delegate = self
         
         configureProgress()
+        
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(refresh), userInfo: nil, repeats: true)
     }
     
     func configureProgress() {
-        let myStack = UIStackView(arrangedSubviews: Array(0..<15).map({ (index) -> UIView in
+        mySubviews = Array(0..<5).map({ (index) -> UIView in
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
             label.textColor = .white
             label.text = String(index + 1)
             label.textAlignment = .center
-            label.backgroundColor = .blue
+            label.backgroundColor = .lightGray
             return label
-        }))
+        })
+        let myStack = UIStackView(arrangedSubviews: mySubviews)
         myStack.spacing = 0.0
         myStack.axis = .horizontal
         myStack.alignment = .fill
         myStack.distribution = .fillEqually
         myStack.translatesAutoresizingMaskIntoConstraints = false
-        let oponentStack = UIStackView(arrangedSubviews: Array(0..<15).map({ (index) -> UIView in
+        
+        oponentSubviews = Array(0..<5).map({ (index) -> UIView in
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
             label.textColor = .white
             label.text = String(index + 1)
             label.textAlignment = .center
-            label.backgroundColor = .blue
+            label.backgroundColor = .lightGray
             return label
-        }))
+        })
+        let oponentStack = UIStackView(arrangedSubviews: oponentSubviews)
         oponentStack.spacing = 0.0
         oponentStack.axis = .horizontal
         oponentStack.alignment = .fill
@@ -69,12 +81,83 @@ class GameVC: UIViewController {
         oponentProgressContainer.rightAnchor.constraint(equalTo: oponentStack.rightAnchor).isActive = true
         oponentProgressContainer.bottomAnchor.constraint(equalTo: oponentStack.bottomAnchor).isActive = true
     }
+    
+    @objc func refresh() {
+        networking.performRequest(to: EndpointCollection.onlineGameRoomInfo(id: roomId ?? "")) { [weak self] (result: Result<GameRoomInfoResponse, Error>) in
+            switch result {
+            case .success(let response):
+                // Update question progress
+                func colorForQuestion(num: Int, question: GameRoomInfoQuestion) -> UIColor {
+                    switch num {
+                    case 1:
+                        return (question.useTrueQuestion) ? .green : .red
+                    case 2:
+                        return (!question.useTrueQuestion) ? .green : .red
+                    default:
+                        return .lightGray
+                    }
+                }
+                DispatchQueue.main.async {
+                    if self?.questions == nil {
+                        self?.questions = response.questionsList
+                        self?.kolodaView.reloadData()
+                    }
+                    
+                    for (index, question) in response.answersPlayer1List.enumerated() {
+                        let questionK = response.questionsList[index]
+                        self?.mySubviews[index].backgroundColor = colorForQuestion(num: question, question: questionK)
+                    }
+                    for (index, question) in response.answersPlayer2List.enumerated() {
+                        let questionK = response.questionsList[index]
+                        self?.oponentSubviews[index].backgroundColor = colorForQuestion(num: question, question: questionK)
+                    }
+                    
+                    if response.answersPlayer1List[4] != 0
+                        && response.answersPlayer2List[4] != 0 {
+                        
+                        let myScore = response.answersPlayer1List.enumerated().map({ (index, elem) in
+                            response.questionsList[index].useTrueQuestion && (elem == 1)
+                        }).reduce(0, { (result, next) -> Int in
+                            return result + (next ? 1 : 0)
+                        })
+                        
+                        let win = (myScore
+                            > response.answersPlayer2List.enumerated().map({ (index, elem) in
+                                response.questionsList[index].useTrueQuestion && (elem == 1)
+                            }).reduce(0, { (result, next) -> Int in
+                                return result + (next ? 1 : 0)
+                            }))
+                        let alert = UIAlertController(title: win ? "You Win" : "You Loose", message: "Your score is \(myScore * 100)", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (_) in
+                            self?.navigationController?.popToRootViewController(animated: true)
+                        }))
+                        self?.present(alert, animated: true, completion: nil)
+                    }
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self?.show(error: error)
+                }
+            }
+        }
+    }
 
     @IBAction func falseAction() {
+        networking.performRequest(to: EndpointCollection.putAnswer, with: PutAnswerRequest(gameRoomId: roomId, answerNumber: jjj, answer: 2)) { [weak self] (error) in
+            guard let error = error else { return }
+            self?.show(error: error)
+        }
+        jjj += 1
         kolodaView.swipe(.left)
     }
     
+    var jjj = 0
     @IBAction func trueAction() {
+        networking.performRequest(to: EndpointCollection.putAnswer, with: PutAnswerRequest(gameRoomId: roomId, answerNumber: jjj, answer: 1)) { [weak self] (error) in
+            guard let error = error else { return }
+            self?.show(error: error)
+        }
+        jjj += 1
         kolodaView.swipe(.right)
     }
     
@@ -83,12 +166,15 @@ class GameVC: UIViewController {
 extension GameVC: KolodaViewDataSource, KolodaViewDelegate {
     
     func koloda(_ koloda: KolodaView, viewForCardAt index: Int) -> UIView {
-        guard let fact = FactsStore.shared.getFact(at: index) else {
-            preconditionFailure("Can't get fact")
-        }
+//        guard let fact = FactsStore.shared.getFact(at: index) else {
+//            preconditionFailure("Can't get fact")
+//        }
+        let factKek = questions![index]
+        let fact = factKek.fact
+        
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = fact.fact
+        label.text = factKek.useTrueQuestion ? fact.trueFact : fact.falseFact
         label.textAlignment = .center
         label.font = UIFont.boldSystemFont(ofSize: 32.0)
         let image = UIImageView()
@@ -115,7 +201,8 @@ extension GameVC: KolodaViewDataSource, KolodaViewDelegate {
     }
     
     func kolodaNumberOfCards(_ koloda: KolodaView) -> Int {
-        return FactsStore.shared.getFactsCount()
+//        return FactsStore.shared.getFactsCount()
+        return questions?.count ?? 0
     }
     
     func koloda(_ koloda: KolodaView, draggedCardWithPercentage finishPercentage: CGFloat, in direction: SwipeResultDirection) {
