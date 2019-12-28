@@ -25,3 +25,6 @@ case class OnlineGameData(gameRoomId: String, player1Name: Option[String], playe
 
 @JsonCodec
 case class OnlineGameResponse(result: Boolean = true, data: OnlineGameData)
+
+@JsonCodec
+case class PutAnswerRequest(gameRoomId: String, answerNumber: Int, answer: Int)

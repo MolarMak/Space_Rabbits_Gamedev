@@ -4,7 +4,8 @@ import akka.http.scaladsl.server.Route
 import apiVersions.BaseView
 import controllers.log
 import controllers.v2.{OnlineGameController, OnlineGameControllerTrait, OnlineGameViewTrait}
-import models.v2.{OnlineGameData, OnlineGameResponse, OnlineRoomIdData, StartGameResponse}
+import models.ResponseTrue
+import models.v2.{OnlineGameData, OnlineGameResponse, OnlineRoomIdData, PutAnswerRequest, RegisterRequest, StartGameResponse}
 import slick.jdbc.PostgresProfile.backend.Database
 
 class OnlineGameView(private val db: Database) extends BaseView with OnlineGameViewTrait {
@@ -35,6 +36,19 @@ class OnlineGameView(private val db: Database) extends BaseView with OnlineGameV
     }
   }
 
+  def putAnswers: Route = {
+    path("api" / apiVersion / "putAnswer") {
+      post {
+        headerValueByName("Authorization") { token =>
+          entity(as[PutAnswerRequest]) { putAnswers =>
+            log("putAnswers", s"input: ${putAnswers.gameRoomId} ${putAnswers.answerNumber} ${putAnswers.answer}")
+            controller.putAnswersRoute(token, putAnswers.gameRoomId, putAnswers.answerNumber, putAnswers.answer)
+          }
+        }
+      }
+    }
+  }
+
   def wsEcho: Route = {
     path("api" / apiVersion / "wsEcho") {
       get {
@@ -49,5 +63,9 @@ class OnlineGameView(private val db: Database) extends BaseView with OnlineGameV
 
   override def onLoadGameInfo(gameData: OnlineGameData): Route = {
     complete(OnlineGameResponse(result = true, gameData))
+  }
+
+  override def onPutAnswer: Route = {
+    complete(ResponseTrue())
   }
 }

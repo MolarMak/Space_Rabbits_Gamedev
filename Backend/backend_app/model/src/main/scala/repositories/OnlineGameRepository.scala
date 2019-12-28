@@ -33,4 +33,20 @@ class OnlineGameRepository(val db: Database)(implicit ec: ExecutionContext) exte
         .headOption
     )
 
+  def putAnswersFirst(gameRoomId: String, answers: String): Future[Int] = //todo add tests
+    db.run(
+      OnlineGameTable.table
+        .filter(_.gameRoomId === gameRoomId)
+        .map(_.answersPlayer1List)
+        .update(answers)
+    )
+
+  def putAnswersSecond(gameRoomId: String, answers: String): Future[Int] = //todo add tests
+    db.run(
+      OnlineGameTable.table
+        .filter(_.gameRoomId === gameRoomId)
+        .map(_.answersPlayer2List)
+        .update(answers)
+    )
+
 }

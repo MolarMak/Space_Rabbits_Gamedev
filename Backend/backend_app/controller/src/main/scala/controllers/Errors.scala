@@ -107,6 +107,10 @@ class Errors(private val language: String) {
     case _ => "Can't find game room answers"
   }
 
+  def ERROR_PUT_ANSWER: String = language match {
+    case _ => "Can't put answer"
+  }
+
   /** Online Game errors END **/
 
 }

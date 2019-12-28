@@ -28,6 +28,7 @@ class QuizConfig(private val db: Database) extends Directives {
       quiz.loadScores ~
       quiz.onlineGameRoom ~
       quiz.onlineGameRoomInfo ~
+      quiz.putAnswer ~
       quiz.wsEcho
   }
 

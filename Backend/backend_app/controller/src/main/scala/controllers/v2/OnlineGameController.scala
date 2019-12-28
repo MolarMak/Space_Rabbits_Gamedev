@@ -5,12 +5,11 @@ import akka.http.scaladsl.server.{Directives, Route}
 import akka.stream.scaladsl.Flow
 import controllers.{Errors, ViewTrait, errorLog, log, _}
 import entities.OnlineGame
+import io.circe.parser.decode
 import io.circe.syntax._
 import models.v2.{FactTrueFalse, OnlineGameData}
 import repositories.{FactRepository, OnlineGameRepository, UserRepository}
 import slick.jdbc.PostgresProfile.backend.Database
-import io.circe.parser.decode
-import io.circe.syntax._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
@@ -18,12 +17,14 @@ import scala.util.{Failure, Success}
 trait OnlineGameControllerTrait {
   def startOnlineGameRoute(token: String) : Route
   def getGameRoomInfoRoute(token: String, gameRoomId: String) : Route
+  def putAnswersRoute(token: String, gameRoomId: String, answerNumber: Int, answer: Int) : Route
   def echoService: Flow[Message, Message, _]
 }
 
 trait OnlineGameViewTrait extends ViewTrait {
   def onStartOnlineGame(gameRoomId: String) : Route
   def onLoadGameInfo(gameData: OnlineGameData) : Route
+  def onPutAnswer: Route
 }
 
 class OnlineGameController(private val db: Database, private val view: OnlineGameViewTrait) extends Directives with OnlineGameControllerTrait {
@@ -201,11 +202,89 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
   /** Get game room info END **/
 
 
+  /** Put answers START **/
+  override def putAnswersRoute(token: String, gameRoomId: String, answerNumber: Int, answer: Int): Route = {
+    val tokenValidateFuture = userRepository.getUserIdByToken(token)
+    onComplete(tokenValidateFuture) {
+      case Success(Some(userId)) => findGameToPut(userId, gameRoomId, answerNumber, answer)
+      case Failure(exception) =>
+        errorLog("putAnswersRoute", s"${exception.toString}")
+        view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
+      case other =>
+        log("putAnswersRoute", s"${other.toString}")
+        view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
+    }
+  }
+
+  private def findGameToPut(userId: Int, gameRoomId: String, answerNumber: Int, answer: Int) : Route = {
+    val gameRoomInfo = onlineGameRepository.getRoomInfo(gameRoomId)
+    onComplete(gameRoomInfo) {
+      case Success(Some(gameInfo)) =>
+        if(gameInfo.player1Id.contains(userId)) {
+          putAnswersFirst(userId, gameInfo, answerNumber, answer)
+        } else if(gameInfo.player2Id.contains(userId)) {
+          putAnswersSecond(userId, gameInfo, answerNumber, answer)
+        } else {
+          log("findGameToPut", s"can't find user to put $gameRoomId $userId")
+          view.onAuthError(List(errors.ERROR_GAME_ROOM_FIND))
+        }
+      case Failure(exception) =>
+        errorLog("findGameToPut", s"${exception.toString}")
+        view.onAuthError(List(errors.ERROR_GAME_ROOM_FIND))
+      case other =>
+        log("findGameToPut", s"${other.toString}")
+        view.onAuthError(List(errors.ERROR_GAME_ROOM_FIND))
+    }
+  }
+
+  private def putAnswersFirst(userId: Int, gameRoomInfo: OnlineGame, answerNumber: Int, answer: Int) : Route = {
+    decode[List[Int]](gameRoomInfo.answersPlayer1List) match {
+      case Right(answers1) =>
+        val answers = answers1.patch(answerNumber, Seq(answer), 1) //todo check answer number
+        val putAnswersFirstFuture = onlineGameRepository.putAnswersFirst(gameRoomInfo.gameRoomId, answers.asJson.noSpaces)
+        onComplete(putAnswersFirstFuture) {
+          case Success(1) => view.onPutAnswer
+          case Failure(exception) =>
+            errorLog("putAnswersFirst", s"${exception.toString}")
+            view.onAuthError(List(errors.ERROR_PUT_ANSWER))
+          case other =>
+            log("putAnswersFirst", s"${other.toString}")
+            view.onAuthError(List(errors.ERROR_PUT_ANSWER))
+        }
+
+      case _ =>
+        errorLog("convertGameInfo", s"parce error answers1 ${gameRoomInfo.toString}")
+        view.onAuthError(List(errors.ERROR_GAME_ROOM_ANSWERS_FIND))
+    }
+  }
+
+  private def putAnswersSecond(userId: Int, gameRoomInfo: OnlineGame, answerNumber: Int, answer: Int) : Route = {
+    decode[List[Int]](gameRoomInfo.answersPlayer2List) match {
+      case Right(answers2) =>
+        val answers = answers2.patch(answerNumber, Seq(answer), 1) //todo check answer number
+        val putAnswersSecondFuture = onlineGameRepository.putAnswersSecond(gameRoomInfo.gameRoomId, answers.asJson.noSpaces)
+        onComplete(putAnswersSecondFuture) {
+          case Success(1) => view.onPutAnswer
+          case Failure(exception) =>
+            errorLog("putAnswersSecond", s"${exception.toString}")
+            view.onAuthError(List(errors.ERROR_PUT_ANSWER))
+          case other =>
+            log("putAnswersSecond", s"${other.toString}")
+            view.onAuthError(List(errors.ERROR_PUT_ANSWER))
+        }
+
+      case _ =>
+        errorLog("convertGameInfo", s"parce error answers2 ${gameRoomInfo.toString}")
+        view.onAuthError(List(errors.ERROR_GAME_ROOM_ANSWERS_FIND))
+    }
+  }
+  /** Put answers END **/
+
+
   /** WS echo START **/
   def echoService: Flow[Message, Message, _] = Flow[Message].map {
     case TextMessage.Strict(txt) => TextMessage("ECHO: " + txt)
     case _ => TextMessage("Message type unsupported")
   }
   /** WS echo END **/
-
 }

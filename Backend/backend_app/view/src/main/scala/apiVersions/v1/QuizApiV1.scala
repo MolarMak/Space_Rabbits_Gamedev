@@ -27,5 +27,7 @@ class QuizApiV1(private val db: Database) extends QuizApiTrait {
 
   override def onlineGameRoomInfo: Route = onlineGameView.onlineGameRoomInfo
 
+  override def putAnswer: Route = onlineGameView.putAnswers
+
   override def wsEcho: Route = onlineGameView.wsEcho
 }
