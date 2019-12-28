@@ -4,22 +4,26 @@ import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.stream.scaladsl.Flow
 import controllers.{Errors, ViewTrait, errorLog, log, _}
-import entities.{Fact, OnlineGame}
+import entities.OnlineGame
+import io.circe.syntax._
+import models.v2.{FactTrueFalse, OnlineGameData}
 import repositories.{FactRepository, OnlineGameRepository, UserRepository}
 import slick.jdbc.PostgresProfile.backend.Database
+import io.circe.parser.decode
+import io.circe.syntax._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
-import io.circe.syntax._
-import models.v2.FactTrueFalse
 
 trait OnlineGameControllerTrait {
   def startOnlineGameRoute(token: String) : Route
+  def getGameRoomInfoRoute(token: String, gameRoomId: String) : Route
   def echoService: Flow[Message, Message, _]
 }
 
 trait OnlineGameViewTrait extends ViewTrait {
   def onStartOnlineGame(gameRoomId: String) : Route
+  def onLoadGameInfo(gameData: OnlineGameData) : Route
 }
 
 class OnlineGameController(private val db: Database, private val view: OnlineGameViewTrait) extends Directives with OnlineGameControllerTrait {
@@ -32,9 +36,9 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
 
   /** Create game room START **/
   override def startOnlineGameRoute(token: String): Route = {
-    val tokenValidateFuture = userRepository.checkToken(token)
+    val tokenValidateFuture = userRepository.getUserIdByToken(token)
     onComplete(tokenValidateFuture) {
-      case Success(true) => getFreeSpotOrCreateNewOne
+      case Success(Some(userId)) => getFreeSpotOrCreateNewOne(userId)
       case Failure(exception) =>
         errorLog("startOnlineGameRoute", s"${exception.toString}")
         view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
@@ -44,28 +48,42 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
     }
   }
 
-  private def getFreeSpotOrCreateNewOne: Route = {
+  private def getFreeSpotOrCreateNewOne(userId: Int): Route = {
     val getExistGameRoomId = onlineGameRepository.searchFreeGameSpot
     onComplete(getExistGameRoomId) {
-      case Success(Some(gameRoom)) => view.onStartOnlineGame(gameRoom.gameRoomId)
-      case Success(None) => pickRandomQuestions
+      case Success(Some(gameRoom)) => joinExistingRoom(gameRoom.id, userId, gameRoom.gameRoomId)
+      case Success(None) => pickRandomQuestions(userId)
       case Failure(exception) =>
-        errorLog("getFreeSpot", s"${exception.toString}")
+        errorLog("getFreeSpotOrCreateNewOne", s"${exception.toString}")
         view.onError(List(errors.ERROR_GAME_ROOM_OPEN))
       case other =>
-        log("getFreeSpot", s"${other.toString}")
+        log("getFreeSpotOrCreateNewOne", s"${other.toString}")
         view.onError(List(errors.ERROR_GAME_ROOM_OPEN))
     }
   }
 
-  private def pickRandomQuestions : Route = {
+  private def joinExistingRoom(roomId: Int, userId: Int, gameRoomId: String): Route = {
+    val joinExistsRoom = onlineGameRepository.joinToGame(roomId, userId)
+    onComplete(joinExistsRoom) {
+      case Success(1) => view.onStartOnlineGame(gameRoomId)
+      case Failure(exception) =>
+        errorLog("joinExistingRoom", s"$roomId $userId ${exception.toString}")
+        view.onError(List(errors.ERROR_GAME_ROOM_OPEN))
+      case other =>
+        log("joinExistingRoom", s"$roomId $userId ${other.toString}")
+        view.onError(List(errors.ERROR_GAME_ROOM_OPEN))
+    }
+
+  }
+
+  private def pickRandomQuestions(userId: Int) : Route = {
     val random = new scala.util.Random
     val getAllFacts = factRepository.all
     onComplete(getAllFacts) {
       case Success(facts) =>
         val randomFacts = Stream.continually(random.nextInt(facts.length)).map(facts).take(5).toList
         val randomTakeTrueFalse = randomFacts.map(it => FactTrueFalse(it, random.nextInt(2) == 0))
-        createNewOne(randomTakeTrueFalse)
+        createNewOne(userId, randomTakeTrueFalse)
       case Failure(exception) =>
         errorLog("pickRandomQuestions", s"${exception.toString}")
         view.onError(List(errors.ERROR_LOAD_FACTS))
@@ -75,12 +93,12 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
     }
   }
 
-  private def createNewOne(questions: List[FactTrueFalse]): Route = {
+  private def createNewOne(userId: Int, questions: List[FactTrueFalse]): Route = {
     val roomId = generateGameRoomId()
     val onlineGame = OnlineGame(
       1,
       roomId,
-      None,
+      Some(userId),
       None,
       questions.asJson.noSpaces,
       List(0, 0, 0, 0, 0).asJson.noSpaces,
@@ -92,15 +110,95 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
     onComplete(insertOnlineGameFuture) {
       case Success(1) => view.onStartOnlineGame(roomId)
       case Failure(exception) =>
-        errorLog("getSpotOrCreateNewOne", s"onlineGame=$onlineGame ${exception.toString}")
+        errorLog("createNewOne", s"onlineGame=$onlineGame ${exception.toString}")
         view.onError(List(errors.ERROR_GAME_ROOM_OPEN))
       case other =>
-        log("getSpotOrCreateNewOne", s"onlineGame=$onlineGame ${other.toString}")
+        log("createNewOne", s"onlineGame=$onlineGame ${other.toString}")
         view.onError(List(errors.ERROR_GAME_ROOM_OPEN))
     }
   }
   /** Create game room END **/
 
+
+  /** Get game room info START **/
+  override def getGameRoomInfoRoute(token: String, gameRoomId: String) : Route = {
+    val tokenValidateFuture = userRepository.checkToken(token)
+    onComplete(tokenValidateFuture) {
+      case Success(true) => getGameRoomInfo(gameRoomId)
+      case Failure(exception) =>
+        errorLog("getGameRoomInfoRoute", s"${exception.toString}")
+        view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
+      case other =>
+        log("getGameRoomInfoRoute", s"${other.toString}")
+        view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
+    }
+  }
+
+  private def getGameRoomInfo(gameRoomId: String) : Route = {
+    val gameRoomInfo = onlineGameRepository.getRoomInfo(gameRoomId)
+    onComplete(gameRoomInfo) {
+      case Success(Some(gameInfo)) => convertGameInfo(gameInfo)
+      case Failure(exception) =>
+        errorLog("getGameRoomInfo", s"${exception.toString}")
+        view.onAuthError(List(errors.ERROR_GAME_ROOM_FIND))
+      case other =>
+        log("getGameRoomInfo", s"${other.toString}")
+        view.onAuthError(List(errors.ERROR_GAME_ROOM_FIND))
+    }
+  }
+
+  private def convertGameInfo(gameInfo: OnlineGame) : Route = { //todo put in few functions
+    val getFirstUserName = userRepository.getUserNameById(gameInfo.player1Id) //todo 1 func
+    onComplete(getFirstUserName) {
+      case Success(userName1) =>
+        val getSecondUserName = userRepository.getUserNameById(gameInfo.player2Id) //todo 2 func
+        onComplete(getSecondUserName) {
+          case Success(userName2) =>
+            decode[List[FactTrueFalse]](gameInfo.questionsList) match { //todo 3 func
+              case Right(facts) =>
+                decode[List[Int]](gameInfo.answersPlayer1List) match { //todo 4 func
+                  case Right(answers1) =>
+                    decode[List[Int]](gameInfo.answersPlayer2List) match { //todo 5 func
+                      case Right(answers2) =>
+                        view.onLoadGameInfo(
+                          OnlineGameData(
+                            gameInfo.gameRoomId,
+                            userName1,
+                            userName2,
+                            facts,
+                            answers1,
+                            answers2
+                          )
+                        )
+                      case _ =>
+                        errorLog("convertGameInfo", s"parce error answers2 ${gameInfo.toString}")
+                        view.onAuthError(List(errors.ERROR_GAME_ROOM_ANSWERS_FIND))
+                    }
+
+                  case _ =>
+                    errorLog("convertGameInfo", s"parce error answers1 ${gameInfo.toString}")
+                    view.onAuthError(List(errors.ERROR_GAME_ROOM_ANSWERS_FIND))
+                }
+              case _ =>
+                errorLog("convertGameInfo", s"parce error questions ${gameInfo.toString}")
+                view.onAuthError(List(errors.ERROR_GAME_ROOM_QUESTIONS_FIND))
+            }
+          case Failure(exception) =>
+            errorLog("convertGameInfo", s"second user ${gameInfo.toString} ${exception.toString}")
+            view.onAuthError(List(errors.ERROR_GAME_ROOM_USER_FIND))
+          case other =>
+            log("convertGameInfo", s"second user ${gameInfo.toString} ${other.toString}")
+            view.onAuthError(List(errors.ERROR_GAME_ROOM_USER_FIND))
+        }
+      case Failure(exception) =>
+        errorLog("convertGameInfo", s"first user ${gameInfo.toString} ${exception.toString}")
+        view.onAuthError(List(errors.ERROR_GAME_ROOM_FIND))
+      case other =>
+        log("convertGameInfo", s"first user ${gameInfo.toString} ${other.toString}")
+        view.onAuthError(List(errors.ERROR_GAME_ROOM_FIND))
+    }
+  }
+  /** Get game room info END **/
 
 
   /** WS echo START **/

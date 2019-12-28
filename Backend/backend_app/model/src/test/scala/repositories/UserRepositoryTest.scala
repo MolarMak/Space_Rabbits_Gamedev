@@ -45,6 +45,20 @@ class UserRepositoryTest
     }
   }
 
+  "UserRepository" should "get username by id" in {
+    whenReady(repo.all) { users =>
+      whenReady(repo.getUserNameById(Some(users(0).id))) { user =>
+        user.get shouldBe "test1"
+      }
+      whenReady(repo.getUserNameById(Some(users(1).id))) { user =>
+        user.get shouldBe "test2"
+      }
+      whenReady(repo.getUserNameById(None)) { user =>
+        user shouldBe None
+      }
+    }
+  }
+
   "UserRepository" should "update a single entity" in {
     whenReady(repo.all) { users =>
       val testEntity: User = repo.findById(users(1).id).futureValue.get

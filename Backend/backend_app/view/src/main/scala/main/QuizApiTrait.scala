@@ -16,6 +16,8 @@ trait QuizApiTrait {
 
   def onlineGameRoom: Route
 
+  def onlineGameRoomInfo: Route
+
   def wsEcho: Route
 
 }

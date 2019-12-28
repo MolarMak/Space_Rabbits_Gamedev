@@ -7,7 +7,10 @@ import io.circe.generic.JsonCodec
 case class FactTrueFalse(fact: Fact, useTrueQuestion: Boolean)
 
 @JsonCodec
-case class StartGameResponse(result: Boolean = true, roomId: String)
+case class OnlineRoomIdData(roomId: String)
+
+@JsonCodec
+case class StartGameResponse(result: Boolean = true, data: OnlineRoomIdData)
 
 /**
   * @param gameRoomId - unique generated String value
@@ -18,4 +21,7 @@ case class StartGameResponse(result: Boolean = true, roomId: String)
   * @param answersPlayer2List - Json to String object of array of booleans (0 - unfinished, 1 - right, 2 - wrong)
   */
 @JsonCodec
-case class OnlineGameResponse(gameRoomId: String, player1Name: Option[String], player2Name: Option[String], questionsList: List[FactTrueFalse], answersPlayer1List: List[Int], answersPlayer2List: List[Int])
+case class OnlineGameData(gameRoomId: String, player1Name: Option[String], player2Name: Option[String], questionsList: List[FactTrueFalse], answersPlayer1List: List[Int], answersPlayer2List: List[Int])
+
+@JsonCodec
+case class OnlineGameResponse(result: Boolean = true, data: OnlineGameData)

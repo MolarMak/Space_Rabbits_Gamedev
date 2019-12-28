@@ -91,6 +91,22 @@ class Errors(private val language: String) {
     case _ => "Can't open new game room"
   }
 
+  def ERROR_GAME_ROOM_FIND: String = language match {
+    case _ => "Can't find game room"
+  }
+
+  def ERROR_GAME_ROOM_USER_FIND: String = language match {
+    case _ => "Can't find game room user"
+  }
+
+  def ERROR_GAME_ROOM_QUESTIONS_FIND: String = language match {
+    case _ => "Can't find game room questions"
+  }
+
+  def ERROR_GAME_ROOM_ANSWERS_FIND: String = language match {
+    case _ => "Can't find game room answers"
+  }
+
   /** Online Game errors END **/
 
 }

@@ -60,4 +60,13 @@ class UserRepository(val db: Database)(implicit ec: ExecutionContext) extends Ba
         .exists
         .result
     )
+
+  def getUserNameById(id: Option[Int]) : Future[Option[String]] =
+    db.run(
+      UserTable.table
+        .filter(_.id === id)
+        .map(_.login)
+        .result
+        .headOption
+    )
 }

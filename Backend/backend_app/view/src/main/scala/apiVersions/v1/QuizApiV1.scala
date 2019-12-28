@@ -1,7 +1,6 @@
 package apiVersions.v1
 
 import akka.http.scaladsl.server.Route
-import apiVersions.UpdateVersionView
 import apiVersions.v2.OnlineGameView
 import main.QuizApiTrait
 import slick.jdbc.PostgresProfile.backend.Database
@@ -25,6 +24,8 @@ class QuizApiV1(private val db: Database) extends QuizApiTrait {
   override def loadScores: Route = profileView.loadScores
 
   override def onlineGameRoom: Route = onlineGameView.onlineGameRoom
+
+  override def onlineGameRoomInfo: Route = onlineGameView.onlineGameRoomInfo
 
   override def wsEcho: Route = onlineGameView.wsEcho
 }

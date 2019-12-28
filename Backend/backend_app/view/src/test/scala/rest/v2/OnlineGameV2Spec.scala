@@ -1,6 +1,5 @@
 package rest.v2
 
-import akka.actor.Status.Success
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Route
@@ -10,7 +9,7 @@ import controllers.Errors
 import entities.Fact
 import io.circe.parser.decode
 import io.circe.syntax._
-import models.v2.{LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, StartGameResponse}
+import models.v2._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Matchers, WordSpec}
 import repositories.{FactRepository, OnlineGameRepository, StatisticRepository, UserRepository}
@@ -74,7 +73,24 @@ class OnlineGameV2Spec extends WordSpec with Matchers with ScalatestRouteTest wi
         decode[StartGameResponse](responseAs[String]) match {
           case Right(json) =>
             whenReady(repo.findById(1)) { gameRoom =>
-              json.roomId shouldEqual gameRoom.get.gameRoomId
+              json.data.roomId shouldEqual gameRoom.get.gameRoomId
+              json.result shouldEqual true
+              getOnlineGameRoomInfo(token, json.data.roomId)
+            }
+          case _ => false shouldEqual true
+        }
+      }
+    }
+
+    def getOnlineGameRoomInfo(token: String, roomId: String) = {
+      Get(s"/api/$apiVersion/onlineGameRoomInfo?gameRoomId=$roomId") ~> RawHeader("Authorization", token) ~> Route.seal(quizApi.onlineGameRoomInfo) ~> check {
+        status shouldEqual StatusCodes.OK
+        decode[OnlineGameResponse](responseAs[String]) match {
+          case Right(json) =>
+            whenReady(repo.findById(1)) { gameRoom =>
+              json.data.gameRoomId shouldEqual gameRoom.get.gameRoomId
+              json.data.player1Name shouldEqual Some("molarmaker")
+              json.data.player2Name shouldEqual None
               json.result shouldEqual true
             }
           case _ => false shouldEqual true
@@ -105,11 +121,28 @@ class OnlineGameV2Spec extends WordSpec with Matchers with ScalatestRouteTest wi
             decode[StartGameResponse](responseAs[String]) match {
               case Right(json) =>
                 json.result shouldEqual true
-                json.roomId shouldEqual gameRoom.gameRoomId
+                json.data.roomId shouldEqual gameRoom.gameRoomId
+                getOnlineGameRoomInfo(token, json.data.roomId)
               case _ => false shouldEqual true
             }
           }
         case _ => false shouldEqual true
+      }
+    }
+
+    def getOnlineGameRoomInfo(token: String, roomId: String) = {
+      Get(s"/api/$apiVersion/onlineGameRoomInfo?gameRoomId=$roomId") ~> RawHeader("Authorization", token) ~> Route.seal(quizApi.onlineGameRoomInfo) ~> check {
+        status shouldEqual StatusCodes.OK
+        decode[OnlineGameResponse](responseAs[String]) match {
+          case Right(json) =>
+            whenReady(repo.findById(1)) { gameRoom =>
+              json.data.gameRoomId shouldEqual gameRoom.get.gameRoomId
+              json.data.player1Name shouldEqual Some("molarmaker")
+              json.data.player2Name shouldEqual Some("molarmaker2")
+              json.result shouldEqual true
+            }
+          case _ => false shouldEqual true
+        }
       }
     }
 

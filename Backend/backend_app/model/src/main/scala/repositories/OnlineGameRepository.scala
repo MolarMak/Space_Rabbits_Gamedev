@@ -25,4 +25,12 @@ class OnlineGameRepository(val db: Database)(implicit ec: ExecutionContext) exte
         .update(Some(userId))
     )
 
+  def getRoomInfo(gameRoomId: String): Future[Option[OnlineGame]] =
+    db.run(
+      OnlineGameTable.table
+        .filter(_.gameRoomId === gameRoomId)
+        .result
+        .headOption
+    )
+
 }

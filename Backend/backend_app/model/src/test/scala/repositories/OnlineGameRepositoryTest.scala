@@ -52,6 +52,15 @@ class OnlineGameRepositoryTest
     }
   }
 
+  "OnlineGameRepositoryTest" should "get game room by gameRoomId" in {
+    whenReady(repo.all) { games =>
+      whenReady(repo.getRoomInfo(games(0).gameRoomId)) {
+        case Some(game) => game.id shouldEqual games(0).id
+        case _ => false shouldEqual true
+      }
+    }
+  }
+
   "OnlineGameRepositoryTest" should "search for game with free spot for second user" in {
     whenReady(repo.searchFreeGameSpot) {
       case Some(game) =>
