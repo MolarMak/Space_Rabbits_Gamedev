@@ -1,6 +1,6 @@
 
 package object main {
 
-  val serverVersion = "1.0.1"
+  val serverVersion = "1.0.2"
 
 }

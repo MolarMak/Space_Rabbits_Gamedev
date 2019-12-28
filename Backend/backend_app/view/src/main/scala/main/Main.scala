@@ -22,7 +22,7 @@ object Main {
 
     val bindingFuture = http.bindAndHandle(quizApi.routes, "0.0.0.0", 80)
 
-    println("Server (version 1.0.1) is now online. Press RETURN to stop...")
+    println(s"Server (version $serverVersion) is now online. Press RETURN to stop...")
     log("main", "Server started")
     scala.io.StdIn.readLine()
     val stop = for {
