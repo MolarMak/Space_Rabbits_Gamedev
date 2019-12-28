@@ -1,5 +1,6 @@
 package rest.v2
 
+import akka.actor.Status.Success
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Route
@@ -71,13 +72,48 @@ class OnlineGameV2Spec extends WordSpec with Matchers with ScalatestRouteTest wi
       Get(s"/api/$apiVersion/onlineGameRoom") ~> RawHeader("Authorization", token) ~> Route.seal(quizApi.onlineGameRoom) ~> check {
         status shouldEqual StatusCodes.OK
         decode[StartGameResponse](responseAs[String]) match {
-          case Right(json) => json.result shouldEqual true
+          case Right(json) =>
+            whenReady(repo.findById(1)) { gameRoom =>
+              json.roomId shouldEqual gameRoom.get.gameRoomId
+              json.result shouldEqual true
+            }
           case _ => false shouldEqual true
         }
       }
     }
 
     val login = LoginRequest("molarmaker", "12345678")
+    val requestEntity = HttpEntity(ContentTypes.`application/json`, login.asJson.toString())
+
+    Post(s"/api/$apiVersion/login", requestEntity) ~> Route.seal(quizApi.login) ~> check {
+      status shouldEqual StatusCodes.OK
+      decode[LoginResponse](responseAs[String]) match {
+        case Right(json) =>
+          json.result shouldEqual true
+          getOnlineGameRoom(json.data.token)
+        case _ => false shouldEqual true
+      }
+    }
+  }
+
+  "get online game room by second user" in {
+    def getOnlineGameRoom(token: String) = {
+      whenReady(repo.findById(1)) {
+        case Some(gameRoom) =>
+          Get(s"/api/$apiVersion/onlineGameRoom") ~> RawHeader("Authorization", token) ~> Route.seal(quizApi.onlineGameRoom) ~> check {
+            status shouldEqual StatusCodes.OK
+            decode[StartGameResponse](responseAs[String]) match {
+              case Right(json) =>
+                json.result shouldEqual true
+                json.roomId shouldEqual gameRoom.gameRoomId
+              case _ => false shouldEqual true
+            }
+          }
+        case _ => false shouldEqual true
+      }
+    }
+
+    val login = LoginRequest("molarmaker2", "12345678")
     val requestEntity = HttpEntity(ContentTypes.`application/json`, login.asJson.toString())
 
     Post(s"/api/$apiVersion/login", requestEntity) ~> Route.seal(quizApi.login) ~> check {

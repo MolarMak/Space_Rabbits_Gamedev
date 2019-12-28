@@ -33,7 +33,7 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
   override def startOnlineGameRoute(token: String): Route = {
     val tokenValidateFuture = userRepository.checkToken(token)
     onComplete(tokenValidateFuture) {
-      case Success(true) => pickRandomQuestions
+      case Success(true) => getFreeSpotOrCreateNewOne
       case Failure(exception) =>
         errorLog("startOnlineGameRoute", s"${exception.toString}")
         view.onAuthError(List(errors.ERROR_TOKEN_NOT_VALID))
@@ -43,13 +43,27 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
     }
   }
 
+  private def getFreeSpotOrCreateNewOne: Route = {
+    val getExistGameRoomId = onlineGameRepository.searchFreeGameSpot
+    onComplete(getExistGameRoomId) {
+      case Success(Some(gameRoom)) => view.onStartOnlineGame(gameRoom.gameRoomId)
+      case Success(None) => pickRandomQuestions
+      case Failure(exception) =>
+        errorLog("getFreeSpot", s"${exception.toString}")
+        view.onError(List(errors.ERROR_GAME_ROOM_OPEN))
+      case other =>
+        log("getFreeSpot", s"${other.toString}")
+        view.onError(List(errors.ERROR_GAME_ROOM_OPEN))
+    }
+  }
+
   private def pickRandomQuestions : Route = {
     val random = new scala.util.Random
     val getAllFacts = factRepository.all
     onComplete(getAllFacts) {
       case Success(facts) =>
         val randomFacts = Stream.continually(random.nextInt(facts.length)).map(facts).take(5).toList
-        getSpotOrCreateNewOne(randomFacts)
+        createNewOne(randomFacts)
       case Failure(exception) =>
         errorLog("pickRandomQuestions", s"${exception.toString}")
         view.onError(List(errors.ERROR_LOAD_FACTS))
@@ -59,7 +73,7 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
     }
   }
 
-  private def getSpotOrCreateNewOne(questions: List[Fact]): Route = {
+  private def createNewOne(questions: List[Fact]): Route = {
     val roomId = generateGameRoomId()
     val onlineGame = OnlineGame(
       1,
