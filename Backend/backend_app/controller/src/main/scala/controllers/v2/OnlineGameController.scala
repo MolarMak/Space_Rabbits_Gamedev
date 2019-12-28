@@ -11,6 +11,7 @@ import slick.jdbc.PostgresProfile.backend.Database
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 import io.circe.syntax._
+import models.v2.FactTrueFalse
 
 trait OnlineGameControllerTrait {
   def startOnlineGameRoute(token: String) : Route
@@ -63,7 +64,8 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
     onComplete(getAllFacts) {
       case Success(facts) =>
         val randomFacts = Stream.continually(random.nextInt(facts.length)).map(facts).take(5).toList
-        createNewOne(randomFacts)
+        val randomTakeTrueFalse = randomFacts.map(it => FactTrueFalse(it, random.nextInt(2) == 0))
+        createNewOne(randomTakeTrueFalse)
       case Failure(exception) =>
         errorLog("pickRandomQuestions", s"${exception.toString}")
         view.onError(List(errors.ERROR_LOAD_FACTS))
@@ -73,7 +75,7 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
     }
   }
 
-  private def createNewOne(questions: List[Fact]): Route = {
+  private def createNewOne(questions: List[FactTrueFalse]): Route = {
     val roomId = generateGameRoomId()
     val onlineGame = OnlineGame(
       1,
@@ -98,6 +100,7 @@ class OnlineGameController(private val db: Database, private val view: OnlineGam
     }
   }
   /** Create game room END **/
+
 
 
   /** WS echo START **/

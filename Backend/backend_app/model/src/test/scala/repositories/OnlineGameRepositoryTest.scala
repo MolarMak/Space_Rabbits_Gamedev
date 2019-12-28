@@ -28,7 +28,7 @@ class OnlineGameRepositoryTest
 
   def createEmptyOnlineGame : OnlineGame = {
     //not to change harcoded string (need to test data consistency)
-    val factsString = "[{\"id\":1,\"fact\":\"fact1\",\"trueFact\":\"trueFact1\",\"falseFact\":\"falseFact1\",\"factVersion\":2},{\"id\":2,\"fact\":\"fact2\",\"trueFact\":\"trueFact2\",\"falseFact\":\"falseFact2\",\"factVersion\":1},{\"id\":3,\"fact\":\"fact3\",\"trueFact\":\"trueFact3\",\"falseFact\":\"falseFact3\",\"factVersion\":2},{\"id\":4,\"fact\":\"fact4\",\"trueFact\":\"trueFact4\",\"falseFact\":\"falseFact4\",\"factVersion\":1},{\"id\":5,\"fact\":\"fact5\",\"trueFact\":\"trueFact5\",\"falseFact\":\"falseFact5\",\"factVersion\":2}]"
+    val factsString = "[{\"fact\":{\"id\":6,\"fact\":\"fact6\",\"trueFact\":\"trueFact6\",\"falseFact\":\"falseFact6\",\"factVersion\":1},\"useTrueQuestion\":false},{\"fact\":{\"id\":16,\"fact\":\"fact16\",\"trueFact\":\"trueFact16\",\"falseFact\":\"falseFact16\",\"factVersion\":1},\"useTrueQuestion\":true},{\"fact\":{\"id\":12,\"fact\":\"fact12\",\"trueFact\":\"trueFact12\",\"falseFact\":\"falseFact12\",\"factVersion\":1},\"useTrueQuestion\":false},{\"fact\":{\"id\":19,\"fact\":\"fact19\",\"trueFact\":\"trueFact19\",\"falseFact\":\"falseFact19\",\"factVersion\":2},\"useTrueQuestion\":false},{\"fact\":{\"id\":12,\"fact\":\"fact12\",\"trueFact\":\"trueFact12\",\"falseFact\":\"falseFact12\",\"factVersion\":1},\"useTrueQuestion\":true}]"
     return OnlineGame(1, "test1", None, None, factsString, List(0,0,0,0,0).asJson.noSpaces, List(0,0,0,0,0).asJson.noSpaces, isGameStarted = false, 0)
   }
 
