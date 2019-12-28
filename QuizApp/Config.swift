@@ -12,6 +12,6 @@ struct Config {
 
     static let basePath = "http://quizapi.studiorabbits.space/api/"
     
-    static let apiVersion = "v1/"
+    static let apiVersion = "v2/"
 
 }
