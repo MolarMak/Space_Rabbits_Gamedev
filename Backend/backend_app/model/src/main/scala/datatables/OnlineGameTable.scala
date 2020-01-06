@@ -5,7 +5,7 @@ import repositories.BaseTable
 import slick.jdbc.PostgresProfile.api._
 
 class OnlineGameTable(tag: Tag) extends Table[OnlineGame](tag, "online_game") with BaseTable[OnlineGame] {
-  val id = column[Int]("online_game_id", O.PrimaryKey)
+  val id = column[Int]("online_game_id", O.PrimaryKey, O.AutoInc)
   val gameRoomId = column[String]("game_room_id")
   val player1Id = column[Option[Int]]("player_one_id")
   val player2Id = column[Option[Int]]("player_two_id")
